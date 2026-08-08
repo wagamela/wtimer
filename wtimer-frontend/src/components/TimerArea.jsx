@@ -3,7 +3,12 @@ import { useScramble } from "../hooks/useScramble.js";
 import { useTimer } from "../hooks/useTimer.js";
 import CubeVisual from "./CubeVisual.jsx";
 
-export default function TimerArea({ currentEvent, solves, onSolveComplete, customScramble }) {
+export default function TimerArea({
+  currentEvent,
+  solves,
+  onSolveComplete,
+  customScramble,
+}) {
   const { scramble, loading, canPrev, next, prev, setCustom } =
     useScramble(currentEvent);
   const [delta, setDelta] = useState(null); // { text, positive }
@@ -107,7 +112,9 @@ export default function TimerArea({ currentEvent, solves, onSolveComplete, custo
           )}
         </div>
       </div>
-      <CubeVisual event={currentEvent} scramble={scramble} />
+      {/* Cube scramble visual disabled for now. Re-enable with:
+          <CubeVisual event={currentEvent} scramble={scramble} />
+      */}
     </div>
   );
 }
