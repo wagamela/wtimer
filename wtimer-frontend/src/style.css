@@ -23,6 +23,14 @@
   --panel-card-bg: rgba(255, 255, 255, 0.05);
   --panel-item-hover: rgba(255, 255, 255, 0.06);
   --panel-best: #43a047;
+  --dropdown-bg: #f0efed;
+  --dropdown-text: #1a1a1a;
+  --dropdown-muted: rgba(26, 26, 26, 0.4);
+  --dropdown-border: rgba(26, 26, 26, 0.15);
+  --dropdown-item-hover: rgba(0, 0, 0, 0.06);
+  --dropdown-scroll: rgba(26, 26, 26, 0.18);
+  --dropdown-scroll-hover: rgba(26, 26, 26, 0.3);
+  --dropdown-shadow: 0 10px 30px rgba(26, 26, 26, 0.18);
   --cube-border: #000000;
 }
 
@@ -36,6 +44,14 @@ body.dark {
   --select-bg: rgba(255, 255, 255, 0.08);
   --select-hover: rgba(255, 255, 255, 0.13);
   --panel-bg: #2a2a2a;
+  --dropdown-bg: #2a2a2a;
+  --dropdown-text: #f0efed;
+  --dropdown-muted: rgba(240, 239, 237, 0.4);
+  --dropdown-border: rgba(255, 255, 255, 0.16);
+  --dropdown-item-hover: rgba(255, 255, 255, 0.06);
+  --dropdown-scroll: rgba(255, 255, 255, 0.14);
+  --dropdown-scroll-hover: rgba(255, 255, 255, 0.24);
+  --dropdown-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   --cube-border: rgba(255, 255, 255, 0.16);
 }
 
@@ -97,50 +113,190 @@ body {
 }
 
 /* ── Dropdown ── */
-.select-wrap {
+.dropdown {
   position: relative;
+  font-family: "Geist Mono", monospace;
+}
+
+.dropdown-trigger {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  outline: none;
+}
+
+.dropdown-chevron {
+  pointer-events: none;
+  transition: transform 0.2s;
+}
+
+.dropdown.open .dropdown-chevron {
+  transform: rotate(180deg);
+}
+
+/* Header variant — sits in the header-right cluster */
+.dd-header {
   flex: 1;
   min-width: 0;
   display: flex;
   align-items: center;
 }
 
-.select-wrap select {
-  appearance: none;
-  -webkit-appearance: none;
+.dd-header .dropdown-trigger {
   width: 100%;
   background: var(--select-bg);
   border: none;
   color: var(--text);
   font-family: "Geist Mono", monospace;
-  font-size: 17px; /* 14 → 17 */
+  font-size: 17px;
   font-weight: 300;
-  padding: 10px 42px 10px 16px;
-  cursor: pointer;
-  outline: none;
+  padding: 10px 16px;
   transition:
     background 0.2s,
     color 0.2s;
 }
 
-.select-wrap select:hover {
+.dd-header .dropdown-trigger:hover {
   background: var(--select-hover);
 }
 
-.select-wrap select option,
-.select-wrap select optgroup {
-  background: var(--bg);
+.dd-header .dropdown-chevron {
+  font-size: 20px;
   color: var(--text);
-  font-family: "Geist Mono", monospace;
+  opacity: 0.5;
 }
 
-.select-icon {
+/* Compact variant — lives inside dark settings cards */
+.dd-compact {
+  display: inline-block;
+}
+
+.dd-compact .dropdown-trigger {
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  color: var(--panel-text);
+  font-family: "Geist Mono", monospace;
+  font-size: 12px;
+  padding: 6px 10px;
+  transition: background 0.2s;
+}
+
+.dd-compact .dropdown-trigger:hover {
+  background: rgba(255, 255, 255, 0.13);
+}
+
+.dd-compact .dropdown-chevron {
+  font-size: 14px;
+  color: var(--panel-muted);
+}
+
+.dd-compact .dropdown-menu {
+  right: 0;
+  left: auto;
+}
+
+/* Menu — follows the app theme, flat & sharp */
+.dropdown-menu {
   position: absolute;
-  right: 12px;
-  font-size: 20px; /* 18 → 20 */
-  color: var(--text);
-  pointer-events: none;
-  opacity: 0.5;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 100;
+  min-width: 100%;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  max-height: 260px;
+  overflow-y: auto;
+  background: var(--dropdown-bg);
+  color: var(--dropdown-text);
+  border: 1px solid var(--dropdown-border);
+  box-shadow: var(--dropdown-shadow);
+  padding: 4px 0;
+  animation: dropdown-in 0.15s ease;
+}
+
+@keyframes dropdown-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-menu::-webkit-scrollbar {
+  width: 8px;
+}
+.dropdown-menu::-webkit-scrollbar-track {
+  background: transparent;
+}
+.dropdown-menu::-webkit-scrollbar-thumb {
+  background: var(--dropdown-scroll);
+}
+.dropdown-menu::-webkit-scrollbar-thumb:hover {
+  background: var(--dropdown-scroll-hover);
+}
+
+.dropdown-group-label {
+  padding: 8px 12px 3px;
+  font-family: "Geist Mono", monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--dropdown-muted);
+  cursor: default;
+}
+
+.dropdown-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 6px 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: "Geist Mono", monospace;
+  font-size: 12px;
+  font-weight: 300;
+  color: var(--dropdown-text);
+  text-align: left;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.dropdown-option:hover,
+.dropdown-option.highlight {
+  background: var(--dropdown-item-hover);
+}
+
+.dropdown-option.selected {
+  color: var(--dropdown-text);
+}
+
+.dropdown-option-label {
+  min-width: 0;
+}
+
+.dropdown-check {
+  width: 14px;
+  font-size: 13px;
+  color: var(--panel-best);
+  opacity: 0;
+  flex-shrink: 0;
+}
+
+.dropdown-option.selected .dropdown-check {
+  opacity: 1;
 }
 
 /* ── Dark toggle ── */
@@ -1060,44 +1216,6 @@ body {
 .settings-seg button.active {
   background: var(--accent);
   color: #fff;
-}
-
-/* Select */
-.settings-select {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.settings-select select {
-  appearance: none;
-  -webkit-appearance: none;
-  background: rgba(255, 255, 255, 0.08);
-  border: none;
-  color: var(--panel-text);
-  font-family: "Geist Mono", monospace;
-  font-size: 12px;
-  padding: 6px 28px 6px 10px;
-  cursor: pointer;
-  outline: none;
-  transition: background 0.2s;
-}
-
-.settings-select select:hover {
-  background: rgba(255, 255, 255, 0.13);
-}
-
-.settings-select select option {
-  background: var(--panel-bg);
-  color: var(--panel-text);
-}
-
-.settings-select i {
-  position: absolute;
-  right: 8px;
-  font-size: 14px;
-  color: var(--panel-muted);
-  pointer-events: none;
 }
 
 /* Number field */
