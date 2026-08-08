@@ -31,7 +31,8 @@ export function consistencyScore(values) {
 // Rolling Ao(n): one point per solve, once at least n solves exist.
 // This is what powers the "rolling averages" line on the progress chart.
 export function rollingAverage(solves, n) {
-  return solves.map((_, i) => {
+  const valid = solves.filter((s) => !s.dnf);
+  return valid.map((_, i) => {
     if (i + 1 < n) return null;
     const windowTimes = solves.slice(i + 1 - n, i + 1).map((s) => s.time);
     const sorted = [...windowTimes].sort((a, b) => a - b);
@@ -42,8 +43,9 @@ export function rollingAverage(solves, n) {
 
 // Best time achieved so far, evaluated after each solve.
 export function pbProgression(solves) {
+  const valid = solves.filter((s) => !s.dnf);
   let best = Infinity;
-  return solves.map((s) => {
+  return valid.map((s) => {
     if (s.time < best) best = s.time;
     return best;
   });
@@ -51,8 +53,9 @@ export function pbProgression(solves) {
 
 // Buckets solve times into a histogram for the distribution graph.
 export function distributionBuckets(solves, bucketCount = 10) {
-  if (solves.length === 0) return [];
-  const times = solves.map((s) => s.time);
+  const valid = solves.filter((s) => !s.dnf);
+  if (valid.length === 0) return [];
+  const times = valid.map((s) => s.time);
   const min = Math.min(...times);
   const max = Math.max(...times);
 
@@ -75,10 +78,11 @@ export function distributionBuckets(solves, bucketCount = 10) {
 // Compares the mean of the first half of a solve history to the second
 // half, to answer "am I actually getting faster?"
 export function improvementTrend(solves) {
-  if (solves.length < 4) return null;
-  const mid = Math.floor(solves.length / 2);
-  const firstHalf = mean(solves.slice(0, mid).map((s) => s.time));
-  const secondHalf = mean(solves.slice(mid).map((s) => s.time));
+  const valid = solves.filter((s) => !s.dnf);
+  if (valid.length < 4) return null;
+  const mid = Math.floor(valid.length / 2);
+  const firstHalf = mean(valid.slice(0, mid).map((s) => s.time));
+  const secondHalf = mean(valid.slice(mid).map((s) => s.time));
   if (!firstHalf) return null;
   return { firstHalf, secondHalf, pctChange: ((secondHalf - firstHalf) / firstHalf) * 100 };
 }
@@ -87,6 +91,7 @@ export function improvementTrend(solves) {
 export function groupByDay(solves) {
   const groups = new Map();
   solves.forEach((s) => {
+    if (s.dnf) return;
     const day = new Date(s.date).toLocaleDateString('sv-SE'); // yyyy-mm-dd, stable sort key
     if (!groups.has(day)) groups.set(day, []);
     groups.get(day).push(s.time);
@@ -106,6 +111,7 @@ export function groupByDay(solves) {
 export function groupByEvent(solves) {
   const groups = new Map();
   solves.forEach((s) => {
+    if (s.dnf) return;
     if (!groups.has(s.event)) groups.set(s.event, []);
     groups.get(s.event).push(s.time);
   });

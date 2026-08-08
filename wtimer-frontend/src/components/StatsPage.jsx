@@ -77,7 +77,7 @@ export default function StatsPage({ solves, currentEvent, onEventChange, isDark 
   const colors = useChartColors(isDark);
 
   const eventSolves = useMemo(
-    () => solves.filter((s) => s.event === currentEvent),
+    () => solves.filter((s) => s.event === currentEvent && !s.dnf),
     [solves, currentEvent],
   );
 

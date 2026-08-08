@@ -26,6 +26,24 @@ export default function App() {
 
   const handleClear = useCallback(() => setSolves([]), []);
 
+  const handleToggleDnf = useCallback((index) => {
+    setSolves((prev) =>
+      prev.map((s, i) => (i === index ? { ...s, dnf: !s.dnf } : s)),
+    );
+  }, []);
+
+  const handleRemoveSolve = useCallback((index) => {
+    setSolves((prev) => prev.filter((_, i) => i !== index));
+  }, []);
+
+  const handleAddPenalty = useCallback((index) => {
+    setSolves((prev) =>
+      prev.map((s, i) =>
+        i === index ? { ...s, time: s.time + 2000, penalties: (s.penalties || 0) + 1 } : s,
+      ),
+    );
+  }, []);
+
   const handleNavSelect = useCallback((i) => {
     if (IMPLEMENTED_NAV_INDICES.includes(i)) setNavIndex(i);
   }, []);
@@ -49,7 +67,14 @@ export default function App() {
             onSolveComplete={handleSolveComplete}
             customScramble={customScramble}
           />
-          <SidePanel solves={solves} onClear={handleClear} />
+          <SidePanel
+              solves={solves}
+              currentEvent={currentEvent}
+              onClear={handleClear}
+              onToggleDnf={handleToggleDnf}
+              onAddPenalty={handleAddPenalty}
+              onRemove={handleRemoveSolve}
+            />
         </div>
       ) : view === 'settings' ? (
         <SettingsPage

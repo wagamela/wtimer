@@ -88,7 +88,7 @@ body {
 }
 
 .header-right {
-  width: 270px; /* same width as the panel */
+  width: 320px; /* same width as the panel */
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -375,7 +375,7 @@ body {
 
 /* ── Side panel (right) ── */
 .side-panel {
-  width: 270px;
+  width: 320px;
   flex-shrink: 0;
   background: var(--panel-bg);
   margin: 16px 0 0 0;
@@ -394,6 +394,7 @@ body {
 }
 
 .avg-card {
+  position: relative;
   flex: 1;
   background: var(--panel-card-bg);
   padding: 14px 10px;
@@ -401,6 +402,20 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 5px;
+}
+
+.stat-event-tag {
+  position: absolute;
+  top: 5px;
+  right: 7px;
+  font-family: "Geist Mono", monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--panel-muted);
+  opacity: 0.6;
+  white-space: nowrap;
 }
 
 .avg-label {
@@ -427,6 +442,46 @@ body {
   color: var(--panel-muted);
   text-align: center;
   line-height: 1.4;
+}
+
+/* Compact extra-stat grid (Average / PB / AO5 PB / AO12 PB) */
+.panel-averages.compact {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 0 18px 18px;
+}
+
+.mini-card {
+  position: relative;
+  background: var(--panel-card-bg);
+  padding: 10px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.mini-label {
+  font-family: "Geist Mono", monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--panel-muted);
+}
+
+.mini-value {
+  font-family: "Geist Mono", monospace;
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--panel-text);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.mini-value.pb {
+  color: var(--panel-best);
 }
 
 /* Divider */
@@ -474,22 +529,10 @@ body {
 
 /* Solve list */
 .solve-list {
-  flex: 1;
-  overflow-y: auto;
   padding: 0 10px 14px;
   list-style: none;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
-}
-
-.solve-list::-webkit-scrollbar {
-  width: 4px;
-}
-.solve-list::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
 }
 
 .solve-empty {
@@ -504,8 +547,8 @@ body {
 .solve-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 9px 12px;
+  gap: 8px;
+  padding: 6px 10px;
   transition: background 0.15s;
   cursor: default;
 }
@@ -541,7 +584,7 @@ body {
 
 .solve-time {
   font-family: "Geist Mono", monospace;
-  font-size: 18px; /* 15 → 18 */
+  font-size: 16px; /* 15 → 18 */
   font-weight: 300;
   color: var(--panel-text);
   font-variant-numeric: tabular-nums;
@@ -549,9 +592,16 @@ body {
   letter-spacing: -0.01em;
 }
 
+.solve-penalty {
+  color: #ef6c00;
+  font-size: 11px;
+  font-weight: 500;
+  margin-left: 4px;
+}
+
 .solve-time-empty {
   font-family: "Geist Mono", monospace;
-  font-size: 18px; /* 15 → 18 */
+  font-size: 16px;
   font-weight: 300;
   color: var(--panel-text);
   margin-left: auto;
@@ -564,6 +614,58 @@ body {
 
 .solve-item.best .solve-time {
   color: var(--panel-best);
+}
+
+.solve-item.dnf {
+  opacity: 0.55;
+}
+
+.solve-time.solve-dnf {
+  color: #e53935;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.solve-action {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 5px;
+  margin-left: 3px;
+  font-family: "Geist Mono", monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--panel-muted);
+  transition:
+    color 0.15s,
+    background 0.15s;
+  flex-shrink: 0;
+  border-radius: 3px;
+}
+
+.solve-action:hover {
+  background: var(--panel-item-hover);
+  color: var(--panel-text);
+}
+
+.solve-action.dnf-action.active {
+  color: #e53935;
+}
+
+.solve-action.penalty-action:hover {
+  color: #ef6c00;
+  background: rgba(239, 108, 0, 0.12);
+}
+
+.solve-action.remove-action:hover {
+  color: #e53935;
+  background: rgba(229, 57, 53, 0.12);
+}
+
+.solve-action i {
+  font-size: 15px;
+  display: block;
 }
 
 /* ── Bottom nav ── */
