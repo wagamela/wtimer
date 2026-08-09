@@ -3,7 +3,14 @@ import { EVENT_LABELS } from '../constants/events.js';
 import { formatTime, calcAo, bestAo } from '../utils/format.js';
 import { mean } from '../utils/stats.js';
 
-export default function SidePanel({ solves, currentEvent, onClear, onToggleDnf, onAddPenalty, onRemove }) {
+export default function SidePanel({
+  solves,
+  currentEvent,
+  onClear,
+  onToggleDnf,
+  onAddPenalty,
+  onRemove,
+}) {
   // Stats are computed per-event (same as the stats page). The recent
   // solves list below always shows solves from any event.
   const eventValid = useMemo(

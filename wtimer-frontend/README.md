@@ -28,6 +28,12 @@ npm run preview
 - **Everything else is a 1:1 behavioral port** — the spacebar hold-to-start
   timer, delta badge, AO5/AO12 averaging, solve list, dark mode, and event
   dropdown all work exactly as before.
+- **Sessions** (new): solves now live inside named sessions, switched from
+  the header ("CFOP Practice ▼" sits right beside the event dropdown). Each
+  session stores its own solve history and stats, is persisted to
+  `localStorage`, and survives reloads. On the first launch the app seeds a
+  default "Session 1"; any solve history saved later is kept per session.
+  Completed solves record the scramble that was on screen.
 
 ## Project structure
 
@@ -39,16 +45,22 @@ src/
   components/
     Header.jsx            event dropdown + dark mode toggle
     TimerArea.jsx          scramble + timer display + delta badge
-    SidePanel.jsx          AO5/AO12 + solve list + clear button
+    SidePanel.jsx          session selector + AO5/AO12 + solve list + clear
+    SessionSelector.jsx    session switcher (create/rename/delete/switch)
+    SessionModal.jsx       create/rename/confirm-delete dialogs
+    SessionsPage.jsx       full solve history of a session, scramble included
     StatsPage.jsx           statistics dashboard (see below)
-    BottomNav.jsx           bottom nav bar — Timer/Stats now switch pages;
-                            Menu/Sessions are still placeholders
+    BottomNav.jsx           bottom nav bar — Timer/Stats/Settings/Sessions
+                            each switch to their page
   hooks/
     useTimer.js            spacebar hold/ready/running state machine
     useScramble.js          scramble generation + regeneration
     useDarkMode.js           dark mode toggle, syncs body.dark class
   constants/
     events.js               event dropdown options + short labels
+  sessions/
+    sessionStore.js          session model, localStorage persistence, migration
+    useSessions.js           sessions state + CRUD (add/switch/create/…)
   utils/
     format.js                formatTime() and calcAo() (average-of-N)
     stats.js                 mean, std dev, consistency score, rolling
@@ -71,34 +83,29 @@ scoped to whichever event is selected in the dropdown at the top:
 - **Distribution graph**: histogram of solve times.
 - **PB progression**: how your best time has stepped down over the
   session.
-- **Daily average**: bars per calendar day. Since solves aren't persisted
-  yet (see note below), this will usually just show a message that more
-  days of data are needed — the chart itself is ready for whenever
-  persistence lands.
+- **Daily average**: bars per calendar day. All statistics are scoped to the
+  active session, and solves now persist to localStorage — enough to populate
+  this chart once a session spans multiple days.
 - **Event comparison**: mean time per event, for whichever events you've
-  actually solved in the current session — a stand-in for the goals doc's
-  "session comparisons" until the full Sessions feature (separate,
-  named practice sessions like "OH Practice" or "Competition Prep")
-  exists.
+  actually solved in the active session.
 
-### Deliberately out of scope for now
+### Flexible sessions
 
-The goals doc's "Flexible Sessions" is its own main goal (named sessions
-with independent history), separate from "event." I didn't build that
-here — the stats page filters by *event* (what the timer already tracks),
-and the event-comparison chart approximates session comparison until real
-sessions exist. Worth building as a following step if you want it.
-
-Solve history still isn't persisted (no localStorage/backend), so daily/
-weekly/monthly trends won't have much to show until solves survive a
-reload — that's under "Cloud synchronization" in the goals doc's
-long-term vision, not something I added here.
+The goals doc's "Flexible Sessions" is now in place — named sessions with
+independent history. The stats page filters by *event* within the active
+session (what the timer already tracks). The session switcher in the header
+lets you create, rename, delete and jump between sessions from any page; the
+**Sessions** tab in the bottom nav shows the selected session's full solve
+history — number, time, penalty, event, date and the scramble used for each
+solve. Solves persist per session and survive page reloads.
 
 ## Why it's split up this way
 
-- **`App.jsx` owns the shared state** (`solves`, `currentEvent`, dark mode)
-  because both `TimerArea` (which adds new solves) and `SidePanel` (which
-  displays them) need access to the same list.
+- **`useSessions` owns shared persistent state** — the session list, active
+  session, and all solve mutations. `App.jsx` reads the active session's
+  solves from it; `TimerArea` (which adds new solves), `SidePanel` (which
+  displays them) and `StatsPage` all consume the same list. CRUD lives behind
+  the hook in `sessions/sessionStore.js`.
 - **`useTimer` is the trickiest hook** — it reproduces the original's exact
   spacebar state machine (hold → ready → running) using refs for the
   timing-critical state (so a re-render never resets it) and only calls
@@ -107,11 +114,9 @@ long-term vision, not something I added here.
 - **`TimerArea` decides what happens on solve completion** (compute the
   delta, hand the new time up via `onSolveComplete`, then ask
   `useScramble` to generate a new scramble) — mirroring the original
-  `stopTimer()` function's sequence of actions.
-
-## Notes
-
-- Bottom nav buttons currently just toggle an "active" visual state — like
-  the original, there's no routing/page-switching wired up behind them.
-- No solve persistence (localStorage etc.) was in the original, so none was
-  added — solves reset on page reload, same as before.
+  `stopTimer()` function's sequence of actions. It also passes the scramble
+  that was on screen so the solve records it.
+- **`sessionStore` keeps data safe** — loading sanitizes corrupt/duplicate
+  ids, repairs a missing active session, migrates any legacy flat solve list
+  into "Session 1" (idempotently), and always guarantees a default session so
+  the app is never left sessionless.

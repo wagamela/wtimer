@@ -138,7 +138,7 @@ function KbdButton({ keys, title }) {
   );
 }
 
-export default function SettingsPage({ customScramble, onCustomScrambleChange }) {
+export default function SettingsPage({ customScramble, onCustomScrambleChange, onClearSession }) {
   const [language, setLanguage] = useState("en");
   const [inspection, setInspection] = useState(true);
   const [inspectionSeconds, setInspectionSeconds] = useState("15");
@@ -408,7 +408,11 @@ export default function SettingsPage({ customScramble, onCustomScrambleChange })
             label="Clear session"
             hint="Removes solves from the current session"
           >
-            <button type="button" className="settings-btn settings-btn-danger">
+            <button
+              type="button"
+              className="settings-btn settings-btn-danger"
+              onClick={onClearSession}
+            >
               <i className="bx bx-trash"></i> Clear
             </button>
           </Row>

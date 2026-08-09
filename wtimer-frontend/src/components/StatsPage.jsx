@@ -222,7 +222,7 @@ export default function StatsPage({ solves, currentEvent, onEventChange, isDark 
               subtitle={<span className="chart-subtitle">Average time per day</span>}
               empty={
                 dailyData.length < 2
-                  ? 'All solves are from today — a trend will appear here as more daily data accumulates. (Solves currently reset on page refresh; persistent storage is on the roadmap.)'
+                  ? 'All solves are from today — a trend will appear here as more daily data accumulates. Solves persist per session across page reloads.'
                   : null
               }
             >

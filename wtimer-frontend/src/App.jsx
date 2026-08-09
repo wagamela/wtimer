@@ -4,51 +4,67 @@ import TimerArea from './components/TimerArea.jsx';
 import SidePanel from './components/SidePanel.jsx';
 import StatsPage from './components/StatsPage.jsx';
 import SettingsPage from './components/SettingsPage.jsx';
+import SessionsPage from './components/SessionsPage.jsx';
 import BottomNav from './components/BottomNav.jsx';
 import { useDarkMode } from './hooks/useDarkMode.js';
+import { useSessions } from './sessions/useSessions.js';
 
-// Timer, Stats and Settings have pages behind them — Sessions is a
-// placeholder until that feature exists.
-const IMPLEMENTED_NAV_INDICES = [0, 1, 2];
+// All four nav rows have pages behind them.
+const IMPLEMENTED_NAV_INDICES = [0, 1, 2, 3];
 
 export default function App() {
   const [currentEvent, setCurrentEvent] = useState('333');
-  const [solves, setSolves] = useState([]);
   const [isDark, toggleDark] = useDarkMode();
   const [navIndex, setNavIndex] = useState(0);
   const [customScramble, setCustomScramble] = useState(false);
 
-  // Store new solve after a completed timing, timestamped so the stats
-  // page can group solves by day.
-  const handleSolveComplete = useCallback((elapsedMs) => {
-    setSolves((prev) => [...prev, { time: elapsedMs, event: currentEvent, date: Date.now() }]);
-  }, [currentEvent]);
+  const {
+    sessions,
+    activeId,
+    activeSession,
+    switchSession,
+    createSession,
+    renameSession,
+    deleteSession,
+    addSolve,
+    toggleDnf,
+    addPenalty,
+    removeSolve,
+    clearSession,
+  } = useSessions();
 
-  const handleClear = useCallback(() => setSolves([]), []);
-
-  const handleToggleDnf = useCallback((index) => {
-    setSolves((prev) =>
-      prev.map((s, i) => (i === index ? { ...s, dnf: !s.dnf } : s)),
-    );
-  }, []);
-
-  const handleRemoveSolve = useCallback((index) => {
-    setSolves((prev) => prev.filter((_, i) => i !== index));
-  }, []);
-
-  const handleAddPenalty = useCallback((index) => {
-    setSolves((prev) =>
-      prev.map((s, i) =>
-        i === index ? { ...s, time: s.time + 2000, penalties: (s.penalties || 0) + 1 } : s,
-      ),
-    );
-  }, []);
+  // Store the completed solve into the active session, timestamped so the
+  // stats page can group solves by day, along with the scramble that was on
+  // screen during the solve.
+  const handleSolveComplete = useCallback(
+    (elapsedMs, scramble) => {
+      addSolve({
+        time: elapsedMs,
+        event: currentEvent,
+        date: Date.now(),
+        scramble,
+      });
+    },
+    [addSolve, currentEvent],
+  );
 
   const handleNavSelect = useCallback((i) => {
     if (IMPLEMENTED_NAV_INDICES.includes(i)) setNavIndex(i);
   }, []);
 
-  const view = navIndex === 1 ? 'stats' : navIndex === 2 ? 'settings' : 'timer';
+  const view =
+    navIndex === 1
+      ? 'stats'
+      : navIndex === 2
+        ? 'settings'
+        : navIndex === 3
+          ? 'sessions'
+          : 'timer';
+
+  // The hook always keeps an active session alive; the solve list the rest of
+  // the UI consumes is exactly that session's solves, so timer stats, the
+  // solve list and the stats page all follow the active session automatically.
+  const solves = activeSession ? activeSession.solves : [];
 
   return (
     <>
@@ -57,6 +73,12 @@ export default function App() {
         onEventChange={setCurrentEvent}
         isDark={isDark}
         onToggleDark={toggleDark}
+        sessions={sessions}
+        activeSessionId={activeId}
+        onSwitchSession={switchSession}
+        onCreateSession={createSession}
+        onRenameSession={renameSession}
+        onDeleteSession={deleteSession}
       />
 
       {view === 'timer' ? (
@@ -68,18 +90,27 @@ export default function App() {
             customScramble={customScramble}
           />
           <SidePanel
-              solves={solves}
-              currentEvent={currentEvent}
-              onClear={handleClear}
-              onToggleDnf={handleToggleDnf}
-              onAddPenalty={handleAddPenalty}
-              onRemove={handleRemoveSolve}
-            />
+            solves={solves}
+            currentEvent={currentEvent}
+            onClear={clearSession}
+            onToggleDnf={toggleDnf}
+            onAddPenalty={addPenalty}
+            onRemove={removeSolve}
+          />
         </div>
       ) : view === 'settings' ? (
         <SettingsPage
           customScramble={customScramble}
           onCustomScrambleChange={setCustomScramble}
+          onClearSession={clearSession}
+        />
+      ) : view === 'sessions' ? (
+        <SessionsPage
+          sessions={sessions}
+          activeSessionId={activeId}
+          onToggleDnf={toggleDnf}
+          onAddPenalty={addPenalty}
+          onRemove={removeSolve}
         />
       ) : (
         <StatsPage

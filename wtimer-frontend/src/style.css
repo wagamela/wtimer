@@ -92,6 +92,7 @@ body {
   min-width: 0;
   display: flex;
   align-items: center;
+  gap: 16px;
 }
 
 .logo {
@@ -540,6 +541,296 @@ body {
   overflow: hidden;
   color: var(--panel-text);
   align-self: stretch;
+}
+
+/* ── Session switch (header control) ── */
+.session-bar {
+  position: relative;
+  flex-shrink: 0;
+  padding: 14px 18px 0;
+}
+
+.session-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--panel-card-bg);
+  border: none;
+  color: var(--panel-text);
+  font-family: "Geist Mono", monospace;
+  cursor: pointer;
+  padding: 8px 10px;
+  transition: background 0.2s;
+}
+
+.session-trigger:hover {
+  background: var(--panel-item-hover);
+}
+
+.session-trigger-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.session-trigger-count {
+  font-family: "Geist Mono", monospace;
+  font-size: 10px;
+  color: var(--panel-muted);
+  background: var(--panel-item-hover);
+  padding: 2px 7px;
+  white-space: nowrap;
+}
+
+.session-trigger-chevron {
+  font-size: 16px;
+  color: var(--panel-muted);
+  transition: transform 0.2s;
+}
+
+.session-bar.open .session-trigger-chevron {
+  transform: rotate(180deg);
+}
+
+.session-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 18px;
+  right: 18px;
+  z-index: 40;
+  max-height: 280px;
+  overflow-y: auto;
+  background: var(--dropdown-bg);
+  color: var(--dropdown-text);
+  border: 1px solid var(--dropdown-border);
+  box-shadow: var(--dropdown-shadow);
+  padding: 4px 0;
+  animation: dropdown-in 0.15s ease;
+}
+
+.session-row {
+  display: flex;
+  align-items: center;
+}
+
+.session-option {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  padding: 7px 12px;
+  cursor: pointer;
+  font-family: "Geist Mono", monospace;
+  font-size: 12px;
+  font-weight: 300;
+  color: var(--dropdown-text);
+  text-align: left;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.session-option:hover {
+  background: var(--dropdown-item-hover);
+}
+
+.session-row.active .session-option {
+  color: var(--panel-best);
+}
+
+.session-option-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.session-option-count {
+  flex-shrink: 0;
+  font-size: 10px;
+  color: var(--dropdown-muted);
+}
+
+.session-row-actions {
+  display: flex;
+  align-items: center;
+  padding-right: 4px;
+}
+
+.session-row-action {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--dropdown-muted);
+  display: flex;
+  align-items: center;
+  padding: 6px;
+  transition:
+    color 0.15s,
+    background 0.15s;
+}
+
+.session-row-action i {
+  font-size: 13px;
+}
+
+.session-row-action:hover {
+  color: var(--dropdown-text);
+  background: var(--dropdown-item-hover);
+}
+
+.session-row-action.danger:hover {
+  color: #e57373;
+  background: rgba(229, 57, 53, 0.12);
+}
+
+.session-new {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  border-top: 1px solid var(--dropdown-border);
+  color: var(--dropdown-text);
+  font-family: "Geist Mono", monospace;
+  font-size: 11px;
+  font-weight: 400;
+  padding: 9px 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.session-new i {
+  font-size: 14px;
+  color: var(--panel-best);
+}
+
+.session-new:hover {
+  background: var(--dropdown-item-hover);
+}
+
+/* ── Modals (session create / rename / delete) ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 12vh 16px 16px;
+}
+
+.modal {
+  width: 100%;
+  max-width: 380px;
+  background: var(--dropdown-bg);
+  color: var(--dropdown-text);
+  border: 1px solid var(--dropdown-border);
+  box-shadow: var(--dropdown-shadow);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: dropdown-in 0.15s ease;
+}
+
+.modal-title {
+  font-family: "Geist Mono", monospace;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.modal-text {
+  font-family: "Geist Mono", monospace;
+  font-size: 12px;
+  color: var(--dropdown-muted);
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.modal-input {
+  width: 100%;
+  padding: 8px 10px;
+  background: var(--select-bg);
+  border: 1px solid var(--select-hover);
+  color: var(--text);
+  font-family: "Geist Mono", monospace;
+  font-size: 13px;
+  outline: none;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+}
+
+.modal-input:focus {
+  border-color: var(--text);
+  background: var(--select-hover);
+}
+
+.modal-input::placeholder {
+  opacity: 0.5;
+}
+
+.modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.modal-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--dropdown-muted);
+  font-family: "Geist Mono", monospace;
+  font-size: 11px;
+  font-weight: 400;
+  padding: 6px 12px;
+  transition:
+    color 0.15s,
+    background 0.15s;
+}
+
+.modal-btn:hover {
+  color: var(--dropdown-text);
+  background: var(--dropdown-item-hover);
+}
+
+.modal-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.modal-btn.primary {
+  background: var(--panel-best);
+  color: #fff;
+}
+
+.modal-btn.primary:hover {
+  background: #2e7d32;
+}
+
+.modal-btn.danger {
+  color: #e57373;
+}
+
+.modal-btn.danger:hover {
+  background: rgba(229, 57, 53, 0.15);
+  color: #ff8a80;
 }
 
 /* Averages block */
@@ -1455,4 +1746,178 @@ body {
 .settings-btn-danger:hover {
   background: rgba(229, 57, 53, 0.15);
   color: #ff8a80;
+}
+/* Header session selector (variant="header") - styled to read as the match
+   of the event dropdown sitting next to it in the header row. */
+.session-bar--header {
+  width: 260px;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.session-bar--header .session-trigger {
+  width: 100%;
+  background: var(--select-bg);
+  border: none;
+  color: var(--text);
+  font-size: 17px;
+  font-weight: 300;
+  padding: 10px 16px;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+
+.session-bar--header .session-trigger:hover {
+  background: var(--select-hover);
+}
+
+.session-bar--header .session-trigger-count {
+  background: var(--select-hover);
+  color: var(--text-muted);
+}
+
+.session-bar--header .session-trigger-chevron {
+  font-size: 20px;
+  color: var(--text);
+  opacity: 0.5;
+}
+
+.session-bar--header .session-menu {
+  left: 0;
+  right: auto;
+  min-width: 260px;
+  max-width: min(320px, calc(100vw - 32px));
+}
+
+/* Sessions page */
+.sessions-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 8px var(--gap) 0;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  gap: 16px;
+}
+
+.sessions-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.sessions-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sessions-title {
+  font-family: "Geist Mono", monospace;
+  font-weight: 300;
+  font-size: 32px;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.sessions-subtitle {
+  font-family: "Geist Mono", monospace;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* The solve history is a dark panel card in both themes, matching the stat
+   cards and the side panel. */
+.sessions-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  background: var(--panel-bg);
+  color: var(--panel-text);
+  margin-bottom: 10px;
+}
+
+.sessions-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "Geist Mono", monospace;
+}
+
+.sessions-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--panel-bg);
+  text-align: left;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--panel-muted);
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--panel-divider);
+  white-space: nowrap;
+}
+
+.sessions-table td {
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--panel-divider);
+  font-size: 12px;
+  vertical-align: middle;
+}
+
+.sessions-table tbody tr {
+  transition: background 0.15s;
+}
+
+.sessions-table tbody tr:hover {
+  background: var(--panel-item-hover);
+}
+
+.sessions-num {
+  color: var(--panel-muted);
+  min-width: 30px;
+  text-align: right;
+}
+
+.sessions-time {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.sessions-time.dnf {
+  color: #e53935;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.sessions-event {
+  color: var(--panel-muted);
+  white-space: nowrap;
+  padding-right: 18px;
+}
+
+.sessions-scramble {
+  color: var(--panel-muted);
+  font-size: 11px;
+  line-height: 1.6;
+  word-spacing: 0.1em;
+  word-break: break-word;
+  min-width: 160px;
+}
+
+.sessions-date {
+  color: var(--panel-muted);
+  font-size: 11px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.sessions-actions {
+  text-align: right;
+  white-space: nowrap;
 }
