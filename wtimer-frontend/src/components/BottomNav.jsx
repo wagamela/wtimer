@@ -2,7 +2,7 @@ const NAV_ITEMS = [
   { icon: 'bx-time-five', title: 'Timer' },
   { icon: 'bx-line-chart', title: 'Stats' },
   { icon: 'bx-cog', title: 'Settings' },
-  { icon: 'bx-dollar-circle', title: 'Sessions' },
+  { icon: 'bx-collection', title: 'Sessions' },
 ];
 
 // Controlled by the parent now (App owns which page is active) instead of

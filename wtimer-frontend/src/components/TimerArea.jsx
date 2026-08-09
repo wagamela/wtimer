@@ -34,7 +34,7 @@ export default function TimerArea({
       setDeltaVisible(false);
     }
 
-    onSolveComplete(elapsedMs);
+    onSolveComplete(elapsedMs, scramble);
     // A freshly generated scramble is offered after each solve, unless the
     // user is managing the scramble manually.
     if (!customScramble) next(true);
