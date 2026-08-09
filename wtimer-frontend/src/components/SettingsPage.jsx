@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Dropdown from "./Dropdown.jsx";
 
 const ACCENTS = [
   { name: "Green", hex: "#43a047" },
@@ -75,14 +76,15 @@ function Segmented({ options, value, onChange }) {
   );
 }
 
-function SelectField({ value, onChange, children }) {
+function SelectField({ value, onChange, options, ariaLabel }) {
   return (
-    <div className="settings-select">
-      <select value={value} onChange={(e) => onChange(e.target.value)}>
-        {children}
-      </select>
-      <i className="bx bx-chevron-down"></i>
-    </div>
+    <Dropdown
+      variant="compact"
+      value={value}
+      onChange={onChange}
+      options={options}
+      ariaLabel={ariaLabel}
+    />
   );
 }
 
@@ -200,12 +202,17 @@ export default function SettingsPage({ customScramble, onCustomScrambleChange })
             label="Outlier handling"
             hint="How DNFs and +2s factor into averages"
           >
-            <SelectField value={outlier} onChange={setOutlier}>
-              <option value="wca">WCA — DNF is worst, +2 counts</option>
-              <option value="lenient">Lenient — ignore DNFs</option>
-              <option value="strict">Strict — DNF breaks the average</option>
-              <option value="trim">Trim best & worst</option>
-            </SelectField>
+            <SelectField
+              value={outlier}
+              onChange={setOutlier}
+              options={[
+                { value: "wca", label: "WCA — DNF is worst, +2 counts" },
+                { value: "lenient", label: "Lenient — ignore DNFs" },
+                { value: "strict", label: "Strict — DNF breaks the average" },
+                { value: "trim", label: "Trim best & worst" },
+              ]}
+              ariaLabel="Outlier handling"
+            />
           </Row>
           <Row label="Stat precision" hint="Decimal places for statistics">
             <Segmented
@@ -232,14 +239,19 @@ export default function SettingsPage({ customScramble, onCustomScrambleChange })
 
         <Section icon="bx-globe" title="General">
           <Row label="Language" hint="Interface language">
-            <SelectField value={language} onChange={setLanguage}>
-              <option value="en">English</option>
-              <option value="zh">中文</option>
-              <option value="es">Español</option>
-              <option value="fr">Français</option>
-              <option value="de">Deutsch</option>
-              <option value="ja">日本語</option>
-            </SelectField>
+            <SelectField
+              value={language}
+              onChange={setLanguage}
+              options={[
+                { value: "en", label: "English" },
+                { value: "zh", label: "中文" },
+                { value: "es", label: "Español" },
+                { value: "fr", label: "Français" },
+                { value: "de", label: "Deutsch" },
+                { value: "ja", label: "日本語" },
+              ]}
+              ariaLabel="Language"
+            />
           </Row>
         </Section>
 
