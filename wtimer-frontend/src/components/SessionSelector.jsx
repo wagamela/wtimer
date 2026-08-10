@@ -43,7 +43,11 @@ export default function SessionSelector({
 
   const barClass = [
     'session-bar',
-    variant === 'header' ? 'session-bar--header' : '',
+    variant === 'header'
+      ? 'session-bar--header'
+      : variant === 'sidebar'
+        ? 'session-bar--sidebar'
+        : '',
     open ? 'open' : '',
   ]
     .filter(Boolean)

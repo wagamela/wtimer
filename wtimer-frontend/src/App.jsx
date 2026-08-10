@@ -79,6 +79,7 @@ export default function App() {
         onCreateSession={createSession}
         onRenameSession={renameSession}
         onDeleteSession={deleteSession}
+        showSessionSwitch={view !== 'timer'}
       />
 
       {view === 'timer' ? (
@@ -92,10 +93,16 @@ export default function App() {
           <SidePanel
             solves={solves}
             currentEvent={currentEvent}
+            sessions={sessions}
+            activeId={activeId}
             onClear={clearSession}
             onToggleDnf={toggleDnf}
             onAddPenalty={addPenalty}
             onRemove={removeSolve}
+            onSwitchSession={switchSession}
+            onCreateSession={createSession}
+            onRenameSession={renameSession}
+            onDeleteSession={deleteSession}
           />
         </div>
       ) : view === 'settings' ? (
