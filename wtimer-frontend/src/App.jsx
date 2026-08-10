@@ -73,13 +73,6 @@ export default function App() {
         onEventChange={setCurrentEvent}
         isDark={isDark}
         onToggleDark={toggleDark}
-        sessions={sessions}
-        activeSessionId={activeId}
-        onSwitchSession={switchSession}
-        onCreateSession={createSession}
-        onRenameSession={renameSession}
-        onDeleteSession={deleteSession}
-        showSessionSwitch={view !== 'timer'}
       />
 
       {view === 'timer' ? (
@@ -96,9 +89,9 @@ export default function App() {
             sessions={sessions}
             activeId={activeId}
             onClear={clearSession}
-            onToggleDnf={toggleDnf}
-            onAddPenalty={addPenalty}
-            onRemove={removeSolve}
+            onToggleDnf={(index) => toggleDnf(activeId, index)}
+            onAddPenalty={(index) => addPenalty(activeId, index)}
+            onRemove={(index) => removeSolve(activeId, index)}
             onSwitchSession={switchSession}
             onCreateSession={createSession}
             onRenameSession={renameSession}

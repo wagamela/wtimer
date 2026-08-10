@@ -1939,15 +1939,88 @@ body {
   color: var(--text-muted);
 }
 
-/* The solve history is a dark panel card in both themes, matching the stat
-   cards and the side panel. */
-.sessions-scroll {
+/* All sessions live in one dark panel card (matching the stat cards and side
+   panel) as an accordion; the whole list scrolls inside it. */
+.sessions-accordion {
   flex: 1;
   min-height: 0;
   overflow: auto;
   background: var(--panel-bg);
   color: var(--panel-text);
   margin-bottom: 10px;
+}
+
+.session-acc + .session-acc {
+  border-top: 1px solid var(--panel-divider);
+}
+
+.session-acc-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: none;
+  color: var(--panel-text);
+  font-family: "Geist Mono", monospace;
+  padding: 14px 16px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.session-acc-header:hover {
+  background: var(--panel-item-hover);
+}
+
+.session-acc-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.session-acc-name.active {
+  color: var(--panel-best);
+}
+
+.session-acc-count {
+  font-family: "Geist Mono", monospace;
+  font-size: 10px;
+  color: var(--panel-muted);
+  background: var(--panel-item-hover);
+  padding: 2px 7px;
+  white-space: nowrap;
+}
+
+.session-acc-chevron {
+  font-size: 18px;
+  color: var(--panel-muted);
+  transition: transform 0.2s;
+}
+
+.session-acc.open .session-acc-chevron {
+  transform: rotate(180deg);
+}
+
+.session-acc-body {
+  margin: 0 12px 12px;
+  background: var(--panel-card-bg);
+  border: 1px solid var(--panel-divider);
+}
+
+.session-acc-empty {
+  margin: 0 12px 12px;
+  padding: 18px 16px 22px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--panel-muted);
+  background: var(--panel-card-bg);
+  border: 1px solid var(--panel-divider);
 }
 
 .sessions-table {
