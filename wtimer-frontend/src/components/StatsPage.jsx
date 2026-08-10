@@ -192,6 +192,7 @@ export default function StatsPage({ solves, currentEvent, onEventChange, isDark 
                   <XAxis dataKey="label" tick={{ fill: colors.muted, fontSize: 11 }} axisLine={{ stroke: colors.grid }} tickLine={false} />
                   <YAxis tick={{ fill: colors.muted, fontSize: 11 }} axisLine={false} tickLine={false} width={30} allowDecimals={false} />
                   <Tooltip
+                    cursor={{ fill: colors.cardBg, stroke: colors.grid }}
                     content={(p) => (
                       <ChartTooltip {...p} colors={colors} formatter={(item) => `${item.value} solves`} />
                     )}
@@ -233,6 +234,7 @@ export default function StatsPage({ solves, currentEvent, onEventChange, isDark 
                     <XAxis dataKey="day" tick={{ fill: colors.muted, fontSize: 11 }} axisLine={{ stroke: colors.grid }} tickLine={false} />
                     <YAxis tick={{ fill: colors.muted, fontSize: 11 }} axisLine={false} tickLine={false} width={40} />
                     <Tooltip
+                      cursor={{ fill: colors.cardBg, stroke: colors.grid }}
                       content={(p) => (
                         <ChartTooltip {...p} colors={colors} formatter={(item) => `Avg: ${item.value.toFixed(2)}s`} />
                       )}
@@ -255,6 +257,7 @@ export default function StatsPage({ solves, currentEvent, onEventChange, isDark 
                     <XAxis type="number" tick={{ fill: colors.muted, fontSize: 11 }} axisLine={{ stroke: colors.grid }} tickLine={false} />
                     <YAxis dataKey="label" type="category" tick={{ fill: colors.text, fontSize: 12 }} axisLine={false} tickLine={false} width={70} />
                     <Tooltip
+                      cursor={{ fill: colors.cardBg, stroke: colors.grid }}
                       content={(p) => (
                         <ChartTooltip {...p} colors={colors} formatter={(item) => `Avg: ${item.value.toFixed(2)}s`} />
                       )}
