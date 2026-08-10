@@ -23,7 +23,7 @@ function useChartColors(isDark) {
     text: '#f0efed',
     muted: 'rgba(240, 239, 237, 0.4)',
     grid: 'rgba(240, 239, 237, 0.1)',
-    cardBg: isDark ? '#2a2a2a' : '#1a1a1a',
+    cardBg: isDark ? '#202020' : '#1a1a1a',
     best: '#43a047',
     worst: '#e53935',
   };

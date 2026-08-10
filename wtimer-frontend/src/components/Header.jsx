@@ -13,20 +13,23 @@ export default function Header({
   onCreateSession,
   onRenameSession,
   onDeleteSession,
+  showSessionSwitch = true,
 }) {
   return (
     <div className="header">
       <div className="header-left">
         <span className="logo">wtimer</span>
-        <SessionSelector
-          variant="header"
-          sessions={sessions}
-          activeId={activeSessionId}
-          onSwitch={onSwitchSession}
-          onCreate={onCreateSession}
-          onRename={onRenameSession}
-          onDelete={onDeleteSession}
-        />
+        {showSessionSwitch && (
+          <SessionSelector
+            variant="header"
+            sessions={sessions}
+            activeId={activeSessionId}
+            onSwitch={onSwitchSession}
+            onCreate={onCreateSession}
+            onRename={onRenameSession}
+            onDelete={onDeleteSession}
+          />
+        )}
       </div>
       <div className="header-right">
         <Dropdown
