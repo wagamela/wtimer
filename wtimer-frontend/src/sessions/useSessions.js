@@ -59,8 +59,10 @@ export function useSessions() {
     });
   }, []);
 
-  // All solve mutations below target the active session's list, keyed by the
-  // same index-into-array convention the original App state used.
+  // All solve mutations below key into a given session's solve list, using the
+  // same index-into-array convention the original App state used. The active
+  // session is resolved by the caller (the timer UI only ever edits the active
+  // session, but the Sessions page edits whichever session is expanded).
   const addSolve = useCallback((solve) => {
     const now = Date.now();
     setStore((prev) => ({
@@ -73,12 +75,12 @@ export function useSessions() {
     }));
   }, []);
 
-  const toggleDnf = useCallback((index) => {
+  const toggleDnf = useCallback((sessionId, index) => {
     const now = Date.now();
     setStore((prev) => ({
       ...prev,
       sessions: prev.sessions.map((s) =>
-        s.id === prev.activeId
+        s.id === sessionId
           ? {
               ...s,
               solves: s.solves.map((slv, i) =>
@@ -91,12 +93,12 @@ export function useSessions() {
     }));
   }, []);
 
-  const addPenalty = useCallback((index) => {
+  const addPenalty = useCallback((sessionId, index) => {
     const now = Date.now();
     setStore((prev) => ({
       ...prev,
       sessions: prev.sessions.map((s) =>
-        s.id === prev.activeId
+        s.id === sessionId
           ? {
               ...s,
               solves: s.solves.map((slv, i) =>
@@ -115,12 +117,12 @@ export function useSessions() {
     }));
   }, []);
 
-  const removeSolve = useCallback((index) => {
+  const removeSolve = useCallback((sessionId, index) => {
     const now = Date.now();
     setStore((prev) => ({
       ...prev,
       sessions: prev.sessions.map((s) =>
-        s.id === prev.activeId
+        s.id === sessionId
           ? {
               ...s,
               solves: s.solves.filter((_, i) => i !== index),
