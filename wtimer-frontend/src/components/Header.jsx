@@ -10,7 +10,7 @@ export default function Header({
   return (
     <div className="header">
       <div className="header-left">
-        <span className="logo">wtimer</span>
+        <span className="logo"><span className="logo-accent">w</span>timer</span>
       </div>
       <div className="header-right">
         <Dropdown

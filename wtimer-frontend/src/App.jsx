@@ -6,6 +6,7 @@ import StatsPage from './components/StatsPage.jsx';
 import SettingsPage from './components/SettingsPage.jsx';
 import SessionsPage from './components/SessionsPage.jsx';
 import BottomNav from './components/BottomNav.jsx';
+import { useAccent } from './hooks/useAccent.js';
 import { useDarkMode } from './hooks/useDarkMode.js';
 import { useSessions } from './sessions/useSessions.js';
 
@@ -15,6 +16,7 @@ const IMPLEMENTED_NAV_INDICES = [0, 1, 2, 3];
 export default function App() {
   const [currentEvent, setCurrentEvent] = useState('333');
   const [isDark, toggleDark] = useDarkMode();
+  const [accent, setAccent] = useAccent();
   const [navIndex, setNavIndex] = useState(0);
   const [customScramble, setCustomScramble] = useState(false);
 
@@ -100,6 +102,8 @@ export default function App() {
         </div>
       ) : view === 'settings' ? (
         <SettingsPage
+          accent={accent}
+          onAccentChange={setAccent}
           customScramble={customScramble}
           onCustomScrambleChange={setCustomScramble}
           onClearSession={clearSession}
@@ -116,6 +120,7 @@ export default function App() {
         <StatsPage
           solves={solves}
           currentEvent={currentEvent}
+          accent={accent}
           onEventChange={setCurrentEvent}
           isDark={isDark}
         />
