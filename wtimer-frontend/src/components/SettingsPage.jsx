@@ -2,9 +2,9 @@ import { useState } from "react";
 import Dropdown from "./Dropdown.jsx";
 
 const ACCENTS = [
+  { name: "Orange", hex: "#fb8c00" },
   { name: "Green", hex: "#43a047" },
   { name: "Blue", hex: "#42a5f5" },
-  { name: "Orange", hex: "#fb8c00" },
   { name: "Purple", hex: "#ab47bc" },
   { name: "Red", hex: "#e53935" },
   { name: "Teal", hex: "#26a69a" },
@@ -138,7 +138,7 @@ function KbdButton({ keys, title }) {
   );
 }
 
-export default function SettingsPage({ customScramble, onCustomScrambleChange, onClearSession }) {
+export default function SettingsPage({ accent, onAccentChange, customScramble, onCustomScrambleChange, onClearSession }) {
   const [language, setLanguage] = useState("en");
   const [inspection, setInspection] = useState(true);
   const [inspectionSeconds, setInspectionSeconds] = useState("15");
@@ -155,7 +155,6 @@ export default function SettingsPage({ customScramble, onCustomScrambleChange, o
   const [statPrecision, setStatPrecision] = useState("2");
   const [rollingWindow, setRollingWindow] = useState("17");
   const [theme, setTheme] = useState("dark");
-  const [accent, setAccent] = useState("#43a047");
   const [fontScale, setFontScale] = useState("normal");
   const [animation, setAnimation] = useState("full");
 
@@ -169,7 +168,7 @@ export default function SettingsPage({ customScramble, onCustomScrambleChange, o
   };
 
   return (
-    <div className="settings-page" style={{ "--accent": accent }}>
+    <div className="settings-page">
       <div className="settings-header">
         <h1 className="settings-title">Settings</h1>
         <button
@@ -343,7 +342,7 @@ export default function SettingsPage({ customScramble, onCustomScrambleChange, o
                   className="settings-swatch"
                   style={{ background: c.hex }}
                   title={c.name}
-                  onClick={() => setAccent(c.hex)}
+                  onClick={() => onAccentChange(c.hex)}
                 >
                   {accent === c.hex && <i className="bx bx-check"></i>}
                 </button>
@@ -356,7 +355,7 @@ export default function SettingsPage({ customScramble, onCustomScrambleChange, o
                 <input
                   type="color"
                   value={accent}
-                  onChange={(e) => setAccent(e.target.value)}
+                  onChange={(e) => onAccentChange(e.target.value)}
                 />
               </label>
             </div>

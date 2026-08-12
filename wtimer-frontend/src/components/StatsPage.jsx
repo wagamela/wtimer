@@ -15,25 +15,25 @@ import {
 // Fixed hex colors (not CSS vars) so recharts' inline SVG styles render
 // correctly in both themes without relying on var() support in every
 // browser. The stat cards/chart cards stay dark in both themes (see
-// --panel-bg in style.css: #1a1a1a light, #2a2a2a dark), so all chart ink
-// is light-on-dark and constant; only the tooltip background follows the
-// panel tint so hover stats blend with their card.
-function useChartColors(isDark) {
+// --panel-bg in style.css), so all chart ink is light-on-dark and constant;
+// accent-driven series use the app accent so charts follow the swatches.
+function useChartColors(isDark, accent) {
   return {
     text: '#f0efed',
     muted: 'rgba(240, 239, 237, 0.4)',
     grid: 'rgba(240, 239, 237, 0.1)',
     cardBg: isDark ? '#202020' : '#1a1a1a',
-    best: '#43a047',
+    best: accent,
     worst: '#e53935',
+    pb: isDark ? '#3fb950' : '#43a047',
   };
 }
 
-function StatCard({ label, value, hint }) {
+function StatCard({ label, value, hint, pb }) {
   return (
     <div className="stat-card">
       <span className="stat-label">{label}</span>
-      <span className="stat-value">{value}</span>
+      <span className={`stat-value${pb ? ' pb' : ''}`}>{value}</span>
       {hint && <span className="stat-hint">{hint}</span>}
     </div>
   );
@@ -67,14 +67,14 @@ function ChartTooltip({ active, payload, label, formatter, isDark, colors }) {
     >
       {label !== undefined && <div style={{ opacity: 0.6, marginBottom: 2 }}>{label}</div>}
       {payload.map((p) => (
-        <div style={{ color : 'green'}} key={p.dataKey}>{formatter ? formatter(p) : p.value}</div>
+        <div style={{ color: p.color }} key={p.dataKey}>{formatter ? formatter(p) : p.value}</div>
       ))}
     </div>
   );
 }
 
-export default function StatsPage({ solves, currentEvent, onEventChange, isDark }) {
-  const colors = useChartColors(isDark);
+export default function StatsPage({ solves, currentEvent, accent, onEventChange, isDark }) {
+  const colors = useChartColors(isDark, accent);
 
   const eventSolves = useMemo(
     () => solves.filter((s) => s.event === currentEvent && !s.dnf),
@@ -143,7 +143,7 @@ export default function StatsPage({ solves, currentEvent, onEventChange, isDark 
             <StatCard label="AO50" value={ao50 !== null ? formatTime(ao50) : '—'} />
             <StatCard label="AO100" value={ao100 !== null ? formatTime(ao100) : '—'} />
             <StatCard label="Mean" value={avgAll !== null ? formatTime(avgAll) : '—'} hint={`${eventSolves.length} solves`} />
-            <StatCard label="Best" value={best !== null ? formatTime(best) : '—'} />
+            <StatCard label="Best" value={best !== null ? formatTime(best) : '—'} pb />
             <StatCard label="Worst" value={worst !== null ? formatTime(worst) : '—'} />
             <StatCard label="Std. Dev" value={sd !== null ? formatTime(sd) : '—'} hint="Statistical measure of consistency" />
             <StatCard
@@ -213,7 +213,7 @@ export default function StatsPage({ solves, currentEvent, onEventChange, isDark 
                       <ChartTooltip {...p} colors={colors} formatter={(item) => `PB: ${item.value.toFixed(2)}s`} />
                     )}
                   />
-                  <Line type="stepAfter" dataKey="pb" stroke={colors.best} strokeWidth={2} dot={false} isAnimationActive={false} />
+                  <Line type="stepAfter" dataKey="pb" stroke={colors.pb} strokeWidth={2} dot={false} isAnimationActive={false} />
                 </LineChart>
               </ResponsiveContainer>
             </ChartCard>
