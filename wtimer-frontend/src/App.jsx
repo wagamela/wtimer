@@ -54,11 +54,11 @@ export default function App() {
 
   const view =
     navIndex === 1
-      ? 'stats'
+      ? 'sessions'
       : navIndex === 2
-        ? 'settings'
+        ? 'stats'
         : navIndex === 3
-          ? 'sessions'
+          ? 'settings'
           : 'timer';
 
   // The hook always keeps an active session alive; the solve list the rest of

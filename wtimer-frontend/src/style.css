@@ -14,6 +14,7 @@
   --nav-bg: #1a1a1a;
   --nav-icon: #ffffff;
   --nav-icon-inactive: #555;
+  --nav-active: #43a047;
   --select-bg: rgba(0, 0, 0, 0.06);
   --select-hover: rgba(0, 0, 0, 0.1);
   --panel-bg: #1a1a1a;
@@ -41,6 +42,7 @@ body.dark {
   --nav-bg: #1c1c1c;
   --nav-icon: #e5e5e5;
   --nav-icon-inactive: #666;
+  --nav-active: #3fb950;
   --select-bg: rgba(255, 255, 255, 0.08);
   --select-hover: rgba(255, 255, 255, 0.13);
   --panel-bg: #202020;
@@ -1244,10 +1246,11 @@ body {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 10px 28px;
+  padding: 10px 16px;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   color: var(--nav-icon-inactive);
   transition:
     background 0.2s,
@@ -1260,12 +1263,20 @@ body {
 }
 
 .nav-item.active {
-  color: var(--nav-icon);
+  color: var(--nav-active);
 }
 .nav-item i {
   font-size: 26px;
   line-height: 1;
 } /* 22 → 26 */
+
+.nav-item span {
+  font-family: "Geist Mono", monospace;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
 
 /* ── Stats page ── */
 .stats-page {
