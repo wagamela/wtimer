@@ -19,6 +19,7 @@ export default function App() {
   const [accent, setAccent] = useAccent();
   const [navIndex, setNavIndex] = useState(0);
   const [customScramble, setCustomScramble] = useState(false);
+  const [precision, setPrecision] = useState("2");
 
   const {
     sessions,
@@ -84,6 +85,7 @@ export default function App() {
             solves={solves}
             onSolveComplete={handleSolveComplete}
             customScramble={customScramble}
+            precision={Number(precision)}
           />
           <SidePanel
             solves={solves}
@@ -106,6 +108,8 @@ export default function App() {
           onAccentChange={setAccent}
           customScramble={customScramble}
           onCustomScrambleChange={setCustomScramble}
+          precision={precision}
+          onPrecisionChange={setPrecision}
           onClearSession={clearSession}
         />
       ) : view === 'sessions' ? (

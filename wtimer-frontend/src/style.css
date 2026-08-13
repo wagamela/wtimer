@@ -521,7 +521,7 @@ body {
 }
 
 .delta-badge.positive {
-  color: var(--accent);
+  color: var(--pb);
 }
 .delta-badge.negative {
   color: #e53935;

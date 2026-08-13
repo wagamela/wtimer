@@ -8,20 +8,24 @@ const HOLD_DELAY = 500;
  *  - release while ready -> timer starts running
  *  - press Space while running -> timer stops, onComplete(elapsedMs) fires
  *
- * `seconds`/`centis` only update when their displayed value actually changes,
+ * `seconds`/`decimals` only update when their displayed value actually changes,
  * same optimization as the original tick() function, to avoid re-rendering
  * on every animation frame unnecessarily.
  */
-export function useTimer(onComplete) {
+export function useTimer(onComplete, precision = 2) {
   const [seconds, setSeconds] = useState('00');
-  const [centis, setCentis] = useState('00');
+  const [decimals, setDecimals] = useState('00');
   const [phase, setPhase] = useState('idle'); // 'idle' | 'holding' | 'ready' | 'running'
 
   const runningRef = useRef(false);
   const startTimeRef = useRef(null);
   const rafRef = useRef(null);
   const lastSecsRef = useRef(-1);
-  const lastCentisRef = useRef(-1);
+  const lastDecimalsRef = useRef(-1);
+  const precisionRef = useRef(precision);
+  useEffect(() => {
+    precisionRef.current = precision;
+  }, [precision]);
   const holdTimerRef = useRef(null);
   const spaceDownRef = useRef(false);
   const isReadyRef = useRef(false);
@@ -38,23 +42,27 @@ export function useTimer(onComplete) {
   const tick = useCallback((ts) => {
     const elapsed = ts - startTimeRef.current;
     const secs = Math.floor(elapsed / 1000);
-    const cent = Math.floor((elapsed % 1000) / 10);
+    const ms = Math.floor(elapsed % 1000);
     if (secs !== lastSecsRef.current) {
       setSeconds(formatTwo(secs));
       lastSecsRef.current = secs;
     }
-    if (cent !== lastCentisRef.current) {
-      setCentis(formatTwo(cent));
-      lastCentisRef.current = cent;
+    const digits =
+      precisionRef.current >= 3
+        ? String(ms).padStart(3, '0')
+        : formatTwo(Math.floor(ms / 10));
+    if (digits !== lastDecimalsRef.current) {
+      setDecimals(digits);
+      lastDecimalsRef.current = digits;
     }
     rafRef.current = requestAnimationFrame(tick);
   }, []);
 
   const resetDisplay = useCallback(() => {
     setSeconds('00');
-    setCentis('00');
+    setDecimals('00');
     lastSecsRef.current = -1;
-    lastCentisRef.current = -1;
+    lastDecimalsRef.current = -1;
   }, []);
 
   const startTimer = useCallback(() => {
@@ -123,5 +131,5 @@ export function useTimer(onComplete) {
     };
   }, [startTimer, stopTimer, resetDisplay]);
 
-  return { seconds, centis, phase };
+  return { seconds, decimals, phase };
 }

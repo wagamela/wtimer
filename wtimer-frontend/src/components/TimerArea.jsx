@@ -8,6 +8,7 @@ export default function TimerArea({
   solves,
   onSolveComplete,
   customScramble,
+  precision = 2,
 }) {
   const { scramble, loading, canPrev, next, prev, setCustom } =
     useScramble(currentEvent);
@@ -20,7 +21,10 @@ export default function TimerArea({
       const lastTime = solves[solves.length - 1].time;
       const diffSec = (elapsedMs - lastTime) / 1000;
       const sign = diffSec > 0 ? "+" : "";
-      setDelta({ text: sign + diffSec.toFixed(2), positive: diffSec <= 0 });
+      setDelta({
+        text: sign + diffSec.toFixed(precision),
+        positive: diffSec <= 0,
+      });
 
       clearTimeout(deltaTimeoutRef.current);
       setDeltaVisible(false);
@@ -40,7 +44,7 @@ export default function TimerArea({
     if (!customScramble) next(true);
   }
 
-  const { seconds, centis, phase } = useTimer(handleComplete);
+  const { seconds, decimals, phase } = useTimer(handleComplete, precision);
 
   // Hide the delta badge as soon as a new hold begins, like the original.
   useEffect(() => {
@@ -100,7 +104,7 @@ export default function TimerArea({
         <div className={timerTextClass}>
           <span>{seconds}</span>
           <span className="sep">.</span>
-          <span>{centis}</span>
+          <span>{decimals}</span>
           {delta && (
             <span
               className={`delta-badge ${delta.positive ? "positive" : "negative"}${

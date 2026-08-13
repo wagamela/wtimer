@@ -138,11 +138,10 @@ function KbdButton({ keys, title }) {
   );
 }
 
-export default function SettingsPage({ accent, onAccentChange, customScramble, onCustomScrambleChange, onClearSession }) {
+export default function SettingsPage({ accent, onAccentChange, customScramble, onCustomScrambleChange, precision, onPrecisionChange, onClearSession }) {
   const [language, setLanguage] = useState("en");
   const [inspection, setInspection] = useState(true);
   const [inspectionSeconds, setInspectionSeconds] = useState("15");
-  const [precision, setPrecision] = useState("3");
   const [hideDuringSolve, setHideDuringSolve] = useState(false);
   const [beep8, setBeep8] = useState(true);
   const [beep12, setBeep12] = useState(true);
@@ -277,7 +276,7 @@ export default function SettingsPage({ accent, onAccentChange, customScramble, o
                 { value: "3", label: "3" },
               ]}
               value={precision}
-              onChange={setPrecision}
+              onChange={onPrecisionChange}
             />
           </Row>
           <Row
