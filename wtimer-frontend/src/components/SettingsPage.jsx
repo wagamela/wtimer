@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Dropdown from "./Dropdown.jsx";
 
 const ACCENTS = [
@@ -129,20 +129,42 @@ function Chip({ label, active, onClick }) {
   );
 }
 
-function KbdButton({ keys, title }) {
+function KbdButton({ keys, title, onChange }) {
+  const [recording, setRecording] = useState(false);
+
+  useEffect(() => {
+    if (!recording) return undefined;
+    function handleKey(e) {
+      e.preventDefault();
+      if (e.key === "Escape") {
+        setRecording(false);
+        return;
+      }
+      if (e.key === " ") return; // space is reserved for the timer
+      onChange(e.key);
+      setRecording(false);
+    }
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [recording, onChange]);
+
   return (
-    <button type="button" className="settings-kbd-btn" title={title}>
-      <span className="settings-kbd">{keys}</span>
+    <button
+      type="button"
+      className={`settings-kbd-btn${recording ? " recording" : ""}`}
+      title={title}
+      onClick={() => setRecording(true)}
+    >
+      <span className="settings-kbd">{recording ? "Press key…" : keys}</span>
       <i className="bx bx-edit-alt"></i>
     </button>
   );
 }
 
-export default function SettingsPage({ accent, onAccentChange, customScramble, onCustomScrambleChange, onClearSession }) {
+export default function SettingsPage({ accent, onAccentChange, customScramble, onCustomScrambleChange, precision, onPrecisionChange, penaltyKey, onPenaltyKeyChange, dnfKey, onDnfKeyChange, onClearSession, onClearAllData }) {
   const [language, setLanguage] = useState("en");
   const [inspection, setInspection] = useState(true);
   const [inspectionSeconds, setInspectionSeconds] = useState("15");
-  const [precision, setPrecision] = useState("3");
   const [hideDuringSolve, setHideDuringSolve] = useState(false);
   const [beep8, setBeep8] = useState(true);
   const [beep12, setBeep12] = useState(true);
@@ -277,7 +299,7 @@ export default function SettingsPage({ accent, onAccentChange, customScramble, o
                 { value: "3", label: "3" },
               ]}
               value={precision}
-              onChange={setPrecision}
+              onChange={onPrecisionChange}
             />
           </Row>
           <Row
@@ -304,11 +326,11 @@ export default function SettingsPage({ accent, onAccentChange, customScramble, o
         </Section>
 
         <Section icon="bx-key" title="Tagging">
-          <Row label="+2 quick-tag" hint="Add a 2-second penalty to a solve">
-            <KbdButton keys="1" title="Change hotkey" />
+          <Row label="+2 quick-tag" hint="Add a 2-second penalty to the last solve">
+            <KbdButton keys={penaltyKey} title="Change hotkey" onChange={onPenaltyKeyChange} />
           </Row>
-          <Row label="DNF quick-tag" hint="Mark a solve as Did Not Finish">
-            <KbdButton keys="2" title="Change hotkey" />
+          <Row label="DNF quick-tag" hint="Mark the last solve as Did Not Finish">
+            <KbdButton keys={dnfKey} title="Change hotkey" onChange={onDnfKeyChange} />
           </Row>
         </Section>
 
@@ -419,7 +441,19 @@ export default function SettingsPage({ accent, onAccentChange, customScramble, o
             label="Clear all data"
             hint="Deletes everything — you'll be asked to confirm first"
           >
-            <button type="button" className="settings-btn settings-btn-danger">
+            <button
+              type="button"
+              className="settings-btn settings-btn-danger"
+              onClick={() => {
+                if (
+                  window.confirm(
+                    "Delete all sessions and solves? This cannot be undone.",
+                  )
+                ) {
+                  onClearAllData();
+                }
+              }}
+            >
               <i className="bx bx-trash"></i> Erase all
             </button>
           </Row>

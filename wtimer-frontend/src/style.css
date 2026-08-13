@@ -434,12 +434,14 @@ body {
   display: block;
   width: 100%;
   max-width: 720px;
+  min-height: 44px;
   margin: 0 auto;
   padding: 10px 14px;
   background: var(--select-bg);
   border: 1px solid var(--select-hover);
-  border-radius: 8px;
   outline: none;
+  resize: none;
+  overflow: hidden;
   text-align: center;
   opacity: 0.9;
   line-height: 1.5;
@@ -521,7 +523,7 @@ body {
 }
 
 .delta-badge.positive {
-  color: var(--accent);
+  color: var(--pb);
 }
 .delta-badge.negative {
   color: #e53935;
@@ -1771,6 +1773,22 @@ body {
 
 .settings-kbd-btn:hover {
   background: rgba(255, 255, 255, 0.06);
+}
+
+.settings-kbd-btn.recording .settings-kbd {
+  border-color: var(--accent);
+  color: var(--accent);
+  animation: settings-kbd-pulse 1s ease-in-out infinite;
+}
+
+@keyframes settings-kbd-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
 }
 
 .settings-kbd {
