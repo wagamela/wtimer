@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import Header from './components/Header.jsx';
 import TimerArea from './components/TimerArea.jsx';
 import SidePanel from './components/SidePanel.jsx';
@@ -20,6 +20,8 @@ export default function App() {
   const [navIndex, setNavIndex] = useState(0);
   const [customScramble, setCustomScramble] = useState(false);
   const [precision, setPrecision] = useState("2");
+  const [penaltyKey, setPenaltyKey] = useState("1");
+  const [dnfKey, setDnfKey] = useState("2");
 
   const {
     sessions,
@@ -70,6 +72,39 @@ export default function App() {
   // solve list and the stats page all follow the active session automatically.
   const solves = activeSession ? activeSession.solves : [];
 
+  // Quick-tag hotkeys: apply +2 / DNF to the most recent solve, exactly like
+  // the corresponding buttons in the side panel's solve list.
+  const tagLastSolvePenalty = useCallback(() => {
+    const lastIdx = solves.length - 1;
+    if (lastIdx >= 0) addPenalty(activeId, lastIdx);
+  }, [solves.length, activeId, addPenalty]);
+
+  const tagLastSolveDnf = useCallback(() => {
+    const lastIdx = solves.length - 1;
+    if (lastIdx >= 0) toggleDnf(activeId, lastIdx);
+  }, [solves.length, activeId, toggleDnf]);
+
+  // Fire the quick-tag hotkeys while on the timer screen, ignoring key presses
+  // while typing into an input (e.g. the custom scramble box).
+  useEffect(() => {
+    if (view !== 'timer') return undefined;
+    function handleKeyDown(e) {
+      const target = e.target;
+      if (
+        target instanceof HTMLElement &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
+      if (e.key === penaltyKey) tagLastSolvePenalty();
+      else if (e.key === dnfKey) tagLastSolveDnf();
+    }
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [view, penaltyKey, dnfKey, tagLastSolvePenalty, tagLastSolveDnf]);
+
   return (
     <>
       <Header
@@ -111,6 +146,10 @@ export default function App() {
           onCustomScrambleChange={setCustomScramble}
           precision={precision}
           onPrecisionChange={setPrecision}
+          penaltyKey={penaltyKey}
+          onPenaltyKeyChange={setPenaltyKey}
+          dnfKey={dnfKey}
+          onDnfKeyChange={setDnfKey}
           onClearSession={clearSession}
           onClearAllData={clearAllData}
         />
