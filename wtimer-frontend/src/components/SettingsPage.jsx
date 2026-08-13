@@ -138,7 +138,7 @@ function KbdButton({ keys, title }) {
   );
 }
 
-export default function SettingsPage({ accent, onAccentChange, customScramble, onCustomScrambleChange, precision, onPrecisionChange, onClearSession }) {
+export default function SettingsPage({ accent, onAccentChange, customScramble, onCustomScrambleChange, precision, onPrecisionChange, onClearSession, onClearAllData }) {
   const [language, setLanguage] = useState("en");
   const [inspection, setInspection] = useState(true);
   const [inspectionSeconds, setInspectionSeconds] = useState("15");
@@ -418,7 +418,19 @@ export default function SettingsPage({ accent, onAccentChange, customScramble, o
             label="Clear all data"
             hint="Deletes everything — you'll be asked to confirm first"
           >
-            <button type="button" className="settings-btn settings-btn-danger">
+            <button
+              type="button"
+              className="settings-btn settings-btn-danger"
+              onClick={() => {
+                if (
+                  window.confirm(
+                    "Delete all sessions and solves? This cannot be undone.",
+                  )
+                ) {
+                  onClearAllData();
+                }
+              }}
+            >
               <i className="bx bx-trash"></i> Erase all
             </button>
           </Row>

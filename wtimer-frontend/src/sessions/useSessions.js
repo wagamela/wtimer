@@ -145,6 +145,12 @@ export function useSessions() {
     }));
   }, []);
 
+  // Nukes every session and solves, leaving a single fresh default session.
+  const clearAllData = useCallback(() => {
+    const fresh = [createSession("Session 1")];
+    setStore({ sessions: fresh, activeId: fresh[0].id });
+  }, []);
+
   return {
     sessions: store.sessions,
     activeId: store.activeId,
@@ -158,5 +164,6 @@ export function useSessions() {
     addPenalty,
     removeSolve,
     clearSession: clearActiveSessionSolves,
+    clearAllData,
   };
 }

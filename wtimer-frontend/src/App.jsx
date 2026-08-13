@@ -34,6 +34,7 @@ export default function App() {
     addPenalty,
     removeSolve,
     clearSession,
+    clearAllData,
   } = useSessions();
 
   // Store the completed solve into the active session, timestamped so the
@@ -111,6 +112,7 @@ export default function App() {
           precision={precision}
           onPrecisionChange={setPrecision}
           onClearSession={clearSession}
+          onClearAllData={clearAllData}
         />
       ) : view === 'sessions' ? (
         <SessionsPage
