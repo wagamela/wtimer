@@ -87,6 +87,15 @@ export function useTimer(onComplete, precision = 2) {
   useEffect(() => {
     function handleKeyDown(e) {
       if (e.code !== 'Space') return;
+      const target = e.target;
+      if (
+        target instanceof HTMLElement &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
       e.preventDefault();
       if (spaceDownRef.current) return;
       spaceDownRef.current = true;

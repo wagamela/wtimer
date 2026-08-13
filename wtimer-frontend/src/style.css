@@ -434,12 +434,14 @@ body {
   display: block;
   width: 100%;
   max-width: 720px;
+  min-height: 44px;
   margin: 0 auto;
   padding: 10px 14px;
   background: var(--select-bg);
   border: 1px solid var(--select-hover);
-  border-radius: 8px;
   outline: none;
+  resize: none;
+  overflow: hidden;
   text-align: center;
   opacity: 0.9;
   line-height: 1.5;
