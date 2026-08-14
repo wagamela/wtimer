@@ -22,9 +22,13 @@ const STAT_OPTIONS = [
   { key: "sd", label: "Std Dev" },
 ];
 
-function Section({ icon, title, children }) {
+function Section({ icon, title, children, wide, danger }) {
   return (
-    <section className="settings-section">
+    <section
+      className={`settings-section${wide ? " settings-section-wide" : ""}${
+        danger ? " settings-section-danger" : ""
+      }`}
+    >
       <div className="settings-section-header">
         <i className={`bx ${icon}`}></i>
         <span>{title}</span>
@@ -200,7 +204,12 @@ export default function SettingsPage({ sessions, activeId, accent, onAccentChang
   return (
     <div className="settings-page">
       <div className="settings-header">
-        <h1 className="settings-title">Settings</h1>
+        <div className="settings-heading">
+          <h1 className="settings-title">Settings</h1>
+          <span className="settings-subtitle">
+            Timer behavior, statistics, and data
+          </span>
+        </div>
         <button
           type="button"
           className="settings-reset"
@@ -211,61 +220,6 @@ export default function SettingsPage({ sessions, activeId, accent, onAccentChang
       </div>
 
       <div className="settings-sections">
-        <Section icon="bx-bar-chart-alt-2" title="Averages">
-          <Row
-            label="Stats shown"
-            hint="Which averages appear on the timer and stats page"
-          >
-            <div className="settings-chip-row">
-              {STAT_OPTIONS.map((opt) => (
-                <Chip
-                  key={opt.key}
-                  label={opt.label}
-                  active={statSet.has(opt.key)}
-                  onClick={() => toggleStat(opt.key)}
-                />
-              ))}
-            </div>
-          </Row>
-          <Row
-            label="Outlier handling"
-            hint="How DNFs and +2s factor into averages"
-          >
-            <SelectField
-              value={outlier}
-              onChange={setOutlier}
-              options={[
-                { value: "wca", label: "WCA — DNF is worst, +2 counts" },
-                { value: "lenient", label: "Lenient — ignore DNFs" },
-                { value: "strict", label: "Strict — DNF breaks the average" },
-                { value: "trim", label: "Trim best & worst" },
-              ]}
-              ariaLabel="Outlier handling"
-            />
-          </Row>
-          <Row label="Stat precision" hint="Decimal places for statistics">
-            <Segmented
-              options={[
-                { value: "1", label: "1" },
-                { value: "2", label: "2" },
-                { value: "3", label: "3" },
-              ]}
-              value={statPrecision}
-              onChange={setStatPrecision}
-            />
-          </Row>
-          <Row
-            label="Custom average window"
-            hint="Solves per custom average (e.g. Ao17)"
-          >
-            <NumberField
-              value={rollingWindow}
-              onChange={setRollingWindow}
-              suffix="solves"
-            />
-          </Row>
-        </Section>
-
         <Section icon="bx-globe" title="General">
           <Row label="Language" hint="Interface language">
             <SelectField
@@ -281,6 +235,15 @@ export default function SettingsPage({ sessions, activeId, accent, onAccentChang
               ]}
               ariaLabel="Language"
             />
+          </Row>
+        </Section>
+
+        <Section icon="bx-shuffle" title="Scrambles">
+          <Row
+            label="Custom scramble"
+            hint="Use your own scramble instead of a generated one"
+          >
+            <Toggle checked={customScramble} onChange={onCustomScrambleChange} />
           </Row>
         </Section>
 
@@ -330,24 +293,6 @@ export default function SettingsPage({ sessions, activeId, accent, onAccentChang
           </Row>
           <Row label="Volume" hint="Master volume for beeps and sounds">
             <Slider value={volume} onChange={setVolume} min={0} max={100} />
-          </Row>
-        </Section>
-
-        <Section icon="bx-key" title="Tagging">
-          <Row label="+2 quick-tag" hint="Add a 2-second penalty to the last solve">
-            <KbdButton keys={penaltyKey} title="Change hotkey" onChange={onPenaltyKeyChange} />
-          </Row>
-          <Row label="DNF quick-tag" hint="Mark the last solve as Did Not Finish">
-            <KbdButton keys={dnfKey} title="Change hotkey" onChange={onDnfKeyChange} />
-          </Row>
-        </Section>
-
-        <Section icon="bx-shuffle" title="Scrambles">
-          <Row
-            label="Custom scramble"
-            hint="Use your own scramble instead of a generated one"
-          >
-            <Toggle checked={customScramble} onChange={onCustomScrambleChange} />
           </Row>
         </Section>
 
@@ -414,6 +359,70 @@ export default function SettingsPage({ sessions, activeId, accent, onAccentChang
           </Row>
         </Section>
 
+        <Section icon="bx-bar-chart-alt-2" title="Averages">
+          <Row
+            label="Stats shown"
+            hint="Which averages appear on the timer and stats page"
+          >
+            <div className="settings-chip-row">
+              {STAT_OPTIONS.map((opt) => (
+                <Chip
+                  key={opt.key}
+                  label={opt.label}
+                  active={statSet.has(opt.key)}
+                  onClick={() => toggleStat(opt.key)}
+                />
+              ))}
+            </div>
+          </Row>
+          <Row
+            label="Outlier handling"
+            hint="How DNFs and +2s factor into averages"
+          >
+            <SelectField
+              value={outlier}
+              onChange={setOutlier}
+              options={[
+                { value: "wca", label: "WCA — DNF is worst, +2 counts" },
+                { value: "lenient", label: "Lenient — ignore DNFs" },
+                { value: "strict", label: "Strict — DNF breaks the average" },
+                { value: "trim", label: "Trim best & worst" },
+              ]}
+              ariaLabel="Outlier handling"
+            />
+          </Row>
+          <Row label="Stat precision" hint="Decimal places for statistics">
+            <Segmented
+              options={[
+                { value: "1", label: "1" },
+                { value: "2", label: "2" },
+                { value: "3", label: "3" },
+              ]}
+              value={statPrecision}
+              onChange={setStatPrecision}
+            />
+          </Row>
+          <Row
+            label="Custom average window"
+            hint="Solves per custom average (e.g. Ao17)"
+          >
+            <NumberField
+              value={rollingWindow}
+              onChange={setRollingWindow}
+              suffix="solves"
+            />
+          </Row>
+        </Section>
+
+        <Section icon="bx-key" title="Tagging">
+          <Row label="+2 quick-tag" hint="Add a 2-second penalty to the last solve">
+            <KbdButton keys={penaltyKey} title="Change hotkey" onChange={onPenaltyKeyChange} />
+          </Row>
+          <Row label="DNF quick-tag" hint="Mark the last solve as Did Not Finish">
+            <KbdButton keys={dnfKey} title="Change hotkey" onChange={onDnfKeyChange} />
+          </Row>
+        </Section>
+
         <Section icon="bx-data" title="Data">
           <Row label="Export" hint="Download your solve history">
             <div className="settings-btn-row">
@@ -433,28 +442,36 @@ export default function SettingsPage({ sessions, activeId, accent, onAccentChang
               <i className="bx bx-upload"></i> Import file
             </button>
           </Row>
+        </Section>
+
+        <Section
+          wide
+          danger
+          icon="bx-error-circle"
+          title="Danger zone"
+        >
           <Row
             label="Clear session"
             hint="Removes solves from the current session"
           >
             <button
               type="button"
-              className="settings-btn settings-btn-danger"
+              className="settings-btn settings-btn-danger-outline"
               onClick={() => setConfirmDialog("session")}
             >
-              <i className="bx bx-trash"></i> Clear
+              <i className="bx bx-trash"></i> Clear session
             </button>
           </Row>
           <Row
-            label="Clear all data"
-            hint="Deletes everything — you'll be asked to confirm first"
+            label="Erase all data"
+            hint="Deletes every session and solve. This cannot be undone."
           >
             <button
               type="button"
-              className="settings-btn settings-btn-danger"
+              className="settings-btn settings-btn-danger-fill"
               onClick={() => setConfirmDialog("all")}
             >
-              <i className="bx bx-trash"></i> Erase all
+              <i className="bx bx-trash"></i> Erase all data
             </button>
           </Row>
         </Section>
