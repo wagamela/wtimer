@@ -36,6 +36,7 @@ export default function App() {
     addPenalty,
     removeSolve,
     clearSession,
+    clearActiveSession,
     clearAllData,
   } = useSessions();
 
@@ -128,7 +129,7 @@ export default function App() {
             currentEvent={currentEvent}
             sessions={sessions}
             activeId={activeId}
-            onClear={clearSession}
+            onClear={clearActiveSession}
             onToggleDnf={(index) => toggleDnf(activeId, index)}
             onAddPenalty={(index) => addPenalty(activeId, index)}
             onRemove={(index) => removeSolve(activeId, index)}
@@ -150,7 +151,7 @@ export default function App() {
           onPenaltyKeyChange={setPenaltyKey}
           dnfKey={dnfKey}
           onDnfKeyChange={setDnfKey}
-          onClearSession={clearSession}
+          onClearSession={clearActiveSession}
           onClearAllData={clearAllData}
         />
       ) : view === 'sessions' ? (
@@ -160,6 +161,10 @@ export default function App() {
           onToggleDnf={toggleDnf}
           onAddPenalty={addPenalty}
           onRemove={removeSolve}
+          onCreateSession={createSession}
+          onRenameSession={renameSession}
+          onDeleteSession={deleteSession}
+          onClearSession={clearSession}
         />
       ) : (
         <StatsPage

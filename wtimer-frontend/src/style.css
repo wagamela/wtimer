@@ -1996,24 +1996,36 @@ body {
   background: var(--panel-bg);
   color: var(--panel-text);
   margin-bottom: 10px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--dropdown-scroll) transparent;
 }
 
-.session-acc + .session-acc {
-  border-top: 1px solid var(--panel-divider);
+.sessions-accordion::-webkit-scrollbar {
+  width: 8px;
+}
+
+.sessions-accordion::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sessions-accordion::-webkit-scrollbar-thumb {
+  background: var(--dropdown-scroll);
+}
+
+.sessions-accordion::-webkit-scrollbar-thumb:hover {
+  background: var(--dropdown-scroll-hover);
+}
+
+/* Collapsed session rows get a bottom rule (not a top border), so every
+   session is closed by a line. Expanded sections skip it — the table body's
+   own card border already separates them. */
+.session-acc:not(.open) {
+  border-bottom: 1px solid var(--panel-divider);
 }
 
 .session-acc-header {
-  width: 100%;
   display: flex;
-  align-items: center;
-  gap: 10px;
-  background: none;
-  border: none;
-  color: var(--panel-text);
-  font-family: "Geist Mono", monospace;
-  padding: 14px 16px;
-  cursor: pointer;
-  text-align: left;
+  align-items: stretch;
   transition: background 0.15s;
 }
 
@@ -2021,9 +2033,27 @@ body {
   background: var(--panel-item-hover);
 }
 
+.session-acc-toggle {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: none;
+  border: none;
+  color: var(--panel-text);
+  font-family: "Geist Mono", monospace;
+  padding: 10px 6px 10px 16px;
+  cursor: pointer;
+  text-align: left;
+}
+
 .session-acc-name {
   flex: 1;
   min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
   font-size: 13px;
   font-weight: 400;
   letter-spacing: 0.02em;
@@ -2036,23 +2066,154 @@ body {
   color: var(--panel-best);
 }
 
-.session-acc-count {
+/* Active session marker — a small accent dot in front of the name */
+.session-acc-name.active::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  background: var(--panel-best);
+  flex-shrink: 0;
+}
+
+/* Compact scoreboard stats in each header. Right-aligned fixed columns so the
+   values line up across every session and the page reads when collapsed. */
+.session-acc-stats {
+  display: flex;
+  align-items: flex-end;
+  gap: 20px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.session-acc-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.session-acc-stat.solves {
+  width: 44px;
+}
+
+.session-acc-stat.avg {
+  width: 64px;
+}
+
+.session-acc-stat.best {
+  width: 64px;
+}
+
+.session-acc-stat-label {
   font-family: "Geist Mono", monospace;
-  font-size: 10px;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   color: var(--panel-muted);
-  background: var(--panel-item-hover);
-  padding: 2px 7px;
+}
+
+.session-acc-stat-value {
+  font-family: "Geist Mono", monospace;
+  font-size: 13px;
+  font-weight: 300;
+  line-height: 1.2;
+  color: var(--panel-text);
+  font-variant-numeric: tabular-nums;
   white-space: nowrap;
+  text-align: right;
+}
+
+.session-acc-stat.best .session-acc-stat-value {
+  color: var(--pb);
 }
 
 .session-acc-chevron {
   font-size: 18px;
   color: var(--panel-muted);
+  flex-shrink: 0;
   transition: transform 0.2s;
 }
 
 .session-acc.open .session-acc-chevron {
   transform: rotate(180deg);
+}
+
+/* Per-session action menu (three-dot trigger + portaled popup) */
+.session-acc-menu {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.session-acc-menu-trigger {
+  width: 38px;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--panel-muted);
+  cursor: pointer;
+  transition:
+    color 0.15s,
+    background 0.15s;
+}
+
+.session-acc-menu-trigger:hover,
+.session-acc-menu-trigger[aria-expanded="true"] {
+  color: var(--panel-text);
+  background: var(--panel-item-hover);
+}
+
+.session-acc-menu-trigger i {
+  font-size: 18px;
+}
+
+.session-acc-menu-pop {
+  position: fixed; /* portaled to <body> — anchor to the viewport, not the doc */
+  right: 0;
+  left: auto;
+  min-width: 200px;
+  padding: 4px;
+}
+
+.session-acc-menu-pop .dropdown-option {
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 7px 10px;
+  font-size: 12px;
+}
+
+.session-acc-menu-pop .dropdown-option i {
+  font-size: 14px;
+  color: var(--panel-muted);
+  margin-left: auto;
+  transition: color 0.15s;
+}
+
+.session-acc-menu-pop .dropdown-option:hover i {
+  color: inherit;
+}
+
+.session-acc-menu-pop .dropdown-option.danger {
+  color: #e57373;
+}
+
+.session-acc-menu-pop .dropdown-option.danger:hover {
+  background: rgba(229, 57, 53, 0.15);
+  color: #ff8a80;
+}
+
+.session-acc-menu-pop .dropdown-option.danger:hover i {
+  color: #ff8a80;
+}
+
+.session-acc-menu-pop .dropdown-option:disabled {
+  opacity: 0.4;
+  cursor: default;
+  pointer-events: none;
 }
 
 .session-acc-body {
@@ -2063,12 +2224,27 @@ body {
 
 .session-acc-empty {
   margin: 0 12px 12px;
-  padding: 18px 16px 22px;
+  padding: 20px 16px 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
   font-size: 12px;
   line-height: 1.6;
   color: var(--panel-muted);
   background: var(--panel-card-bg);
   border: 1px solid var(--panel-divider);
+}
+
+.session-acc-empty i {
+  font-size: 22px;
+  opacity: 0.6;
+}
+
+.session-acc-empty p {
+  max-width: 420px;
 }
 
 .sessions-table {
@@ -2088,20 +2264,25 @@ body {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--panel-muted);
-  padding: 10px 12px;
+  padding: 8px 12px;
   border-bottom: 1px solid var(--panel-divider);
   white-space: nowrap;
 }
 
-.sessions-table td {
-  padding: 6px 12px;
+/* One common separator per row: declared on the <tr>, never on the cells.
+   A row border always spans the full table width, and it is not affected by
+   per-cell quirks — the scramble's -webkit-line-clamp/overflow box or the
+   reduced opacity of DNF cells — that would otherwise break per-cell borders
+   into separate, misaligned segments. */
+.sessions-table tbody tr {
   border-bottom: 1px solid var(--panel-divider);
-  font-size: 12px;
-  vertical-align: middle;
+  transition: background 0.15s;
 }
 
-.sessions-table tbody tr {
-  transition: background 0.15s;
+.sessions-table td {
+  padding: 8px 12px;
+  font-size: 12px;
+  vertical-align: middle;
 }
 
 .sessions-table tbody tr:hover {
@@ -2111,33 +2292,58 @@ body {
 .sessions-num {
   color: var(--panel-muted);
   min-width: 30px;
+  text-align: left;
+  font-size: 11px;
+}
+
+/* Right-aligned header label — out-specify `.sessions-table th` (which sets
+   text-align: left) so it lines up with the right-aligned action buttons. */
+.sessions-table th.sessions-actions-col {
   text-align: right;
 }
 
 .sessions-time {
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
-.sessions-time.dnf {
+.sessions-row.best .sessions-time {
+  color: var(--pb);
+}
+
+.sessions-row.dnf .sessions-time {
   color: #e53935;
   font-weight: 700;
   letter-spacing: 0.02em;
 }
 
+/* Dim the supporting cells of a DNF row so the red time is the focus */
+.sessions-row.dnf .sessions-num,
+.sessions-row.dnf .sessions-event,
+.sessions-row.dnf .sessions-scramble,
+.sessions-row.dnf .sessions-date {
+  opacity: 0.55;
+}
+
 .sessions-event {
   color: var(--panel-muted);
   white-space: nowrap;
-  padding-right: 18px;
+  font-size: 11px;
 }
 
 .sessions-scramble {
   color: var(--panel-muted);
   font-size: 11px;
-  line-height: 1.6;
-  word-spacing: 0.1em;
-  word-break: break-word;
-  min-width: 160px;
+  line-height: 1.5;
+  word-spacing: 0.08em;
+  max-width: 612px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .sessions-date {
@@ -2148,6 +2354,65 @@ body {
 }
 
 .sessions-actions {
-  text-align: right;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
   white-space: nowrap;
+}
+
+.sessions-actions .solve-action {
+  margin-left: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.sessions-actions-col {
+  width: 1%;
+}
+
+/* New session button in the page header */
+.sessions-new-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: none;
+  border: 1px solid var(--select-hover);
+  color: var(--text);
+  font-family: "Geist Mono", monospace;
+  font-size: 12px;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    border-color 0.2s;
+}
+
+.sessions-new-btn:hover {
+  background: var(--select-bg);
+  border-color: var(--text);
+}
+
+.sessions-new-btn i {
+  font-size: 14px;
+  color: var(--accent);
+}
+
+/* Tighter header stats on narrow windows */
+@media (max-width: 720px) {
+  .session-acc-stats {
+    gap: 12px;
+  }
+
+  .session-acc-stat.avg,
+  .session-acc-stat.best {
+    width: 56px;
+  }
+
+  .sessions-table th,
+  .sessions-table td {
+    padding: 7px 8px;
+  }
 }

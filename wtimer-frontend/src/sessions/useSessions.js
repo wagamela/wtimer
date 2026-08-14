@@ -133,7 +133,17 @@ export function useSessions() {
     }));
   }, []);
 
-  const clearActiveSessionSolves = useCallback(() => {
+  const clearSession = useCallback((sessionId) => {
+    const now = Date.now();
+    setStore((prev) => ({
+      ...prev,
+      sessions: prev.sessions.map((s) =>
+        s.id === sessionId ? { ...s, solves: [], updatedAt: now } : s,
+      ),
+    }));
+  }, []);
+
+  const clearActiveSession = useCallback(() => {
     const now = Date.now();
     setStore((prev) => ({
       ...prev,
@@ -163,7 +173,8 @@ export function useSessions() {
     toggleDnf,
     addPenalty,
     removeSolve,
-    clearSession: clearActiveSessionSolves,
+    clearSession,
+    clearActiveSession,
     clearAllData,
   };
 }
