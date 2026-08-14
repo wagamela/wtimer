@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Dropdown from "./Dropdown.jsx";
+import SessionModal from "./SessionModal.jsx";
 
 const ACCENTS = [
   { name: "Orange", hex: "#fb8c00" },
@@ -21,9 +22,13 @@ const STAT_OPTIONS = [
   { key: "sd", label: "Std Dev" },
 ];
 
-function Section({ icon, title, children }) {
+function Section({ icon, title, children, wide, danger }) {
   return (
-    <section className="settings-section">
+    <section
+      className={`settings-section${wide ? " settings-section-wide" : ""}${
+        danger ? " settings-section-danger" : ""
+      }`}
+    >
       <div className="settings-section-header">
         <i className={`bx ${icon}`}></i>
         <span>{title}</span>
@@ -161,7 +166,7 @@ function KbdButton({ keys, title, onChange }) {
   );
 }
 
-export default function SettingsPage({ accent, onAccentChange, customScramble, onCustomScrambleChange, precision, onPrecisionChange, penaltyKey, onPenaltyKeyChange, dnfKey, onDnfKeyChange, onClearSession, onClearAllData }) {
+export default function SettingsPage({ sessions, activeId, accent, onAccentChange, customScramble, onCustomScrambleChange, precision, onPrecisionChange, penaltyKey, onPenaltyKeyChange, dnfKey, onDnfKeyChange, onClearSession, onClearAllData, onResetSettings }) {
   const [language, setLanguage] = useState("en");
   const [inspection, setInspection] = useState(true);
   const [inspectionSeconds, setInspectionSeconds] = useState("15");
@@ -179,6 +184,28 @@ export default function SettingsPage({ accent, onAccentChange, customScramble, o
   const [theme, setTheme] = useState("dark");
   const [fontScale, setFontScale] = useState("normal");
   const [animation, setAnimation] = useState("full");
+  // Which action is awaiting confirmation: 'reset' | 'session' | 'all' | null
+  const [confirmDialog, setConfirmDialog] = useState(null);
+
+  // Restore every local preference to its default. App-level settings are
+  // reset through onResetSettings when the confirmation dialog submits.
+  const resetLocalSettings = () => {
+    setLanguage("en");
+    setInspection(true);
+    setInspectionSeconds("15");
+    setHideDuringSolve(false);
+    setBeep8(true);
+    setBeep12(true);
+    setCompletionSound(true);
+    setVolume(70);
+    setStatSet(new Set(["ao5", "ao12", "ao50", "ao100", "best"]));
+    setOutlier("wca");
+    setStatPrecision("2");
+    setRollingWindow("17");
+    setTheme("dark");
+    setFontScale("normal");
+    setAnimation("full");
+  };
 
   const toggleStat = (key) => {
     setStatSet((prev) => {
@@ -189,75 +216,31 @@ export default function SettingsPage({ accent, onAccentChange, customScramble, o
     });
   };
 
+  const activeSession = sessions.find((s) => s.id === activeId) ?? null;
+  const activeSolves = activeSession?.solves.length ?? 0;
+  const totalSessions = sessions.length;
+  const totalSolves = sessions.reduce((n, s) => n + s.solves.length, 0);
+
   return (
     <div className="settings-page">
       <div className="settings-header">
-        <h1 className="settings-title">Settings</h1>
+        <div className="settings-heading">
+          <h1 className="settings-title">Settings</h1>
+          <span className="settings-subtitle">
+            Timer behavior, statistics, and data
+          </span>
+        </div>
         <button
           type="button"
           className="settings-reset"
           title="Reset to defaults"
+          onClick={() => setConfirmDialog("reset")}
         >
           <i className="bx bx-reset"></i> Reset to defaults
         </button>
       </div>
 
       <div className="settings-sections">
-        <Section icon="bx-bar-chart-alt-2" title="Averages">
-          <Row
-            label="Stats shown"
-            hint="Which averages appear on the timer and stats page"
-          >
-            <div className="settings-chip-row">
-              {STAT_OPTIONS.map((opt) => (
-                <Chip
-                  key={opt.key}
-                  label={opt.label}
-                  active={statSet.has(opt.key)}
-                  onClick={() => toggleStat(opt.key)}
-                />
-              ))}
-            </div>
-          </Row>
-          <Row
-            label="Outlier handling"
-            hint="How DNFs and +2s factor into averages"
-          >
-            <SelectField
-              value={outlier}
-              onChange={setOutlier}
-              options={[
-                { value: "wca", label: "WCA — DNF is worst, +2 counts" },
-                { value: "lenient", label: "Lenient — ignore DNFs" },
-                { value: "strict", label: "Strict — DNF breaks the average" },
-                { value: "trim", label: "Trim best & worst" },
-              ]}
-              ariaLabel="Outlier handling"
-            />
-          </Row>
-          <Row label="Stat precision" hint="Decimal places for statistics">
-            <Segmented
-              options={[
-                { value: "1", label: "1" },
-                { value: "2", label: "2" },
-                { value: "3", label: "3" },
-              ]}
-              value={statPrecision}
-              onChange={setStatPrecision}
-            />
-          </Row>
-          <Row
-            label="Custom average window"
-            hint="Solves per custom average (e.g. Ao17)"
-          >
-            <NumberField
-              value={rollingWindow}
-              onChange={setRollingWindow}
-              suffix="solves"
-            />
-          </Row>
-        </Section>
-
         <Section icon="bx-globe" title="General">
           <Row label="Language" hint="Interface language">
             <SelectField
@@ -273,6 +256,15 @@ export default function SettingsPage({ accent, onAccentChange, customScramble, o
               ]}
               ariaLabel="Language"
             />
+          </Row>
+        </Section>
+
+        <Section icon="bx-shuffle" title="Scrambles">
+          <Row
+            label="Custom scramble"
+            hint="Use your own scramble instead of a generated one"
+          >
+            <Toggle checked={customScramble} onChange={onCustomScrambleChange} />
           </Row>
         </Section>
 
@@ -322,24 +314,6 @@ export default function SettingsPage({ accent, onAccentChange, customScramble, o
           </Row>
           <Row label="Volume" hint="Master volume for beeps and sounds">
             <Slider value={volume} onChange={setVolume} min={0} max={100} />
-          </Row>
-        </Section>
-
-        <Section icon="bx-key" title="Tagging">
-          <Row label="+2 quick-tag" hint="Add a 2-second penalty to the last solve">
-            <KbdButton keys={penaltyKey} title="Change hotkey" onChange={onPenaltyKeyChange} />
-          </Row>
-          <Row label="DNF quick-tag" hint="Mark the last solve as Did Not Finish">
-            <KbdButton keys={dnfKey} title="Change hotkey" onChange={onDnfKeyChange} />
-          </Row>
-        </Section>
-
-        <Section icon="bx-shuffle" title="Scrambles">
-          <Row
-            label="Custom scramble"
-            hint="Use your own scramble instead of a generated one"
-          >
-            <Toggle checked={customScramble} onChange={onCustomScrambleChange} />
           </Row>
         </Section>
 
@@ -406,6 +380,70 @@ export default function SettingsPage({ accent, onAccentChange, customScramble, o
           </Row>
         </Section>
 
+        <Section icon="bx-bar-chart-alt-2" title="Averages">
+          <Row
+            label="Stats shown"
+            hint="Which averages appear on the timer and stats page"
+          >
+            <div className="settings-chip-row">
+              {STAT_OPTIONS.map((opt) => (
+                <Chip
+                  key={opt.key}
+                  label={opt.label}
+                  active={statSet.has(opt.key)}
+                  onClick={() => toggleStat(opt.key)}
+                />
+              ))}
+            </div>
+          </Row>
+          <Row
+            label="Outlier handling"
+            hint="How DNFs and +2s factor into averages"
+          >
+            <SelectField
+              value={outlier}
+              onChange={setOutlier}
+              options={[
+                { value: "wca", label: "WCA — DNF is worst, +2 counts" },
+                { value: "lenient", label: "Lenient — ignore DNFs" },
+                { value: "strict", label: "Strict — DNF breaks the average" },
+                { value: "trim", label: "Trim best & worst" },
+              ]}
+              ariaLabel="Outlier handling"
+            />
+          </Row>
+          <Row label="Stat precision" hint="Decimal places for statistics">
+            <Segmented
+              options={[
+                { value: "1", label: "1" },
+                { value: "2", label: "2" },
+                { value: "3", label: "3" },
+              ]}
+              value={statPrecision}
+              onChange={setStatPrecision}
+            />
+          </Row>
+          <Row
+            label="Custom average window"
+            hint="Solves per custom average (e.g. Ao17)"
+          >
+            <NumberField
+              value={rollingWindow}
+              onChange={setRollingWindow}
+              suffix="solves"
+            />
+          </Row>
+        </Section>
+
+        <Section icon="bx-key" title="Tagging">
+          <Row label="+2 quick-tag" hint="Add a 2-second penalty to the last solve">
+            <KbdButton keys={penaltyKey} title="Change hotkey" onChange={onPenaltyKeyChange} />
+          </Row>
+          <Row label="DNF quick-tag" hint="Mark the last solve as Did Not Finish">
+            <KbdButton keys={dnfKey} title="Change hotkey" onChange={onDnfKeyChange} />
+          </Row>
+        </Section>
+
         <Section icon="bx-data" title="Data">
           <Row label="Export" hint="Download your solve history">
             <div className="settings-btn-row">
@@ -425,40 +463,86 @@ export default function SettingsPage({ accent, onAccentChange, customScramble, o
               <i className="bx bx-upload"></i> Import file
             </button>
           </Row>
+        </Section>
+
+        <Section
+          wide
+          danger
+          icon="bx-error-circle"
+          title="Danger zone"
+        >
           <Row
             label="Clear session"
             hint="Removes solves from the current session"
           >
             <button
               type="button"
-              className="settings-btn settings-btn-danger"
-              onClick={onClearSession}
+              className="settings-btn settings-btn-danger-outline"
+              onClick={() => setConfirmDialog("session")}
             >
-              <i className="bx bx-trash"></i> Clear
+              <i className="bx bx-trash"></i> Clear session
             </button>
           </Row>
           <Row
-            label="Clear all data"
-            hint="Deletes everything — you'll be asked to confirm first"
+            label="Erase all data"
+            hint="Deletes every session and solve. This cannot be undone."
           >
             <button
               type="button"
-              className="settings-btn settings-btn-danger"
-              onClick={() => {
-                if (
-                  window.confirm(
-                    "Delete all sessions and solves? This cannot be undone.",
-                  )
-                ) {
-                  onClearAllData();
-                }
-              }}
+              className="settings-btn settings-btn-danger-fill"
+              onClick={() => setConfirmDialog("all")}
             >
-              <i className="bx bx-trash"></i> Erase all
+              <i className="bx bx-trash"></i> Erase all data
             </button>
           </Row>
         </Section>
       </div>
+
+      {confirmDialog === "reset" && (
+        <SessionModal
+          title="Reset all settings to defaults?"
+          body="This will restore every preference — language, timing, appearance, averages, and hotkeys — to their original values."
+          confirmLabel="Reset"
+          noInput
+          onCancel={() => setConfirmDialog(null)}
+          onSubmit={() => {
+            resetLocalSettings();
+            onResetSettings();
+            setConfirmDialog(null);
+          }}
+        />
+      )}
+      {confirmDialog === "session" && (
+        <SessionModal
+          title={`Clear "${activeSession?.name ?? "current session"}"?`}
+          body={`This will permanently delete all ${activeSolves} ${
+            activeSolves === 1 ? "solve" : "solves"
+          } in this session.`}
+          confirmLabel="Clear"
+          danger
+          onCancel={() => setConfirmDialog(null)}
+          onSubmit={() => {
+            onClearSession();
+            setConfirmDialog(null);
+          }}
+        />
+      )}
+      {confirmDialog === "all" && (
+        <SessionModal
+          title="Clear all data?"
+          body={`This will permanently delete all ${totalSessions} ${
+            totalSessions === 1 ? "session" : "sessions"
+          } and ${totalSolves} ${totalSolves === 1 ? "solve" : "solves"}. It cannot be undone.`}
+          confirmLabel="Erase all"
+          danger
+          tone="danger-darkest"
+          onCancel={() => setConfirmDialog(null)}
+          onSubmit={() => {
+            onClearAllData();
+            setConfirmDialog(null);
+          }}
+        />
+      )}
     </div>
   );
 }
