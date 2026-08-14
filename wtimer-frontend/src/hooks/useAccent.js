@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 const ACCENT_KEY = 'wtimer.accent';
-const DEFAULT_ACCENT = '#fb8c00';
+export const DEFAULT_ACCENT = '#fb8c00';
 
 // Exposes the app-wide accent color. Writes it onto <html> as the `--accent`
 // custom property so any CSS rule — nav active state, PB highlights, logo,

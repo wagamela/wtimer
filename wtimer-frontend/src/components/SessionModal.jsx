@@ -15,6 +15,7 @@ export default function SessionModal({
   confirmLabel,
   danger = false,
   tone = danger ? "danger" : "primary",
+  noInput = false,
   defaultValue = "",
   onCancel,
   onSubmit,
@@ -32,8 +33,8 @@ export default function SessionModal({
           : "modal-btn danger";
 
   useEffect(() => {
-    if (!danger) inputRef.current?.focus();
-  }, [danger]);
+    if (!danger && !noInput) inputRef.current?.focus();
+  }, [danger, noInput]);
 
   useEffect(() => {
     function onKey(e) {
@@ -53,7 +54,7 @@ export default function SessionModal({
       <div className="modal" role="dialog" aria-modal="true">
         <div className="modal-title">{title}</div>
         {body && <p className="modal-text">{body}</p>}
-        {!danger && (
+        {!danger && !noInput && (
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -80,8 +81,8 @@ export default function SessionModal({
           <button
             type="button"
             className={confirmClass}
-            disabled={!danger && !trimmed}
-            onClick={() => (danger ? onSubmit() : onSubmit(trimmed))}
+            disabled={!danger && !noInput && !trimmed}
+            onClick={() => (danger || noInput ? onSubmit() : onSubmit(trimmed))}
           >
             {confirmLabel}
           </button>

@@ -6,7 +6,7 @@ import StatsPage from './components/StatsPage.jsx';
 import SettingsPage from './components/SettingsPage.jsx';
 import SessionsPage from './components/SessionsPage.jsx';
 import BottomNav from './components/BottomNav.jsx';
-import { useAccent } from './hooks/useAccent.js';
+import { useAccent, DEFAULT_ACCENT } from './hooks/useAccent.js';
 import { useDarkMode } from './hooks/useDarkMode.js';
 import { useSessions } from './sessions/useSessions.js';
 
@@ -58,6 +58,16 @@ export default function App() {
   const handleNavSelect = useCallback((i) => {
     if (IMPLEMENTED_NAV_INDICES.includes(i)) setNavIndex(i);
   }, []);
+
+  // Restore every app-level preference to its default. SettingsPage applies
+  // the same reset to its own local state when the confirm dialog submits.
+  const handleResetSettings = useCallback(() => {
+    setAccent(DEFAULT_ACCENT);
+    setCustomScramble(false);
+    setPrecision("2");
+    setPenaltyKey("1");
+    setDnfKey("2");
+  }, [setAccent]);
 
   const view =
     navIndex === 1
@@ -155,6 +165,7 @@ export default function App() {
           onDnfKeyChange={setDnfKey}
           onClearSession={clearActiveSession}
           onClearAllData={clearAllData}
+          onResetSettings={handleResetSettings}
         />
       ) : view === 'sessions' ? (
         <SessionsPage

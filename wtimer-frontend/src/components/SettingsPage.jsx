@@ -166,7 +166,7 @@ function KbdButton({ keys, title, onChange }) {
   );
 }
 
-export default function SettingsPage({ sessions, activeId, accent, onAccentChange, customScramble, onCustomScrambleChange, precision, onPrecisionChange, penaltyKey, onPenaltyKeyChange, dnfKey, onDnfKeyChange, onClearSession, onClearAllData }) {
+export default function SettingsPage({ sessions, activeId, accent, onAccentChange, customScramble, onCustomScrambleChange, precision, onPrecisionChange, penaltyKey, onPenaltyKeyChange, dnfKey, onDnfKeyChange, onClearSession, onClearAllData, onResetSettings }) {
   const [language, setLanguage] = useState("en");
   const [inspection, setInspection] = useState(true);
   const [inspectionSeconds, setInspectionSeconds] = useState("15");
@@ -184,8 +184,28 @@ export default function SettingsPage({ sessions, activeId, accent, onAccentChang
   const [theme, setTheme] = useState("dark");
   const [fontScale, setFontScale] = useState("normal");
   const [animation, setAnimation] = useState("full");
-  // Which destructive action is awaiting confirmation: 'session' | 'all' | null
+  // Which action is awaiting confirmation: 'reset' | 'session' | 'all' | null
   const [confirmDialog, setConfirmDialog] = useState(null);
+
+  // Restore every local preference to its default. App-level settings are
+  // reset through onResetSettings when the confirmation dialog submits.
+  const resetLocalSettings = () => {
+    setLanguage("en");
+    setInspection(true);
+    setInspectionSeconds("15");
+    setHideDuringSolve(false);
+    setBeep8(true);
+    setBeep12(true);
+    setCompletionSound(true);
+    setVolume(70);
+    setStatSet(new Set(["ao5", "ao12", "ao50", "ao100", "best"]));
+    setOutlier("wca");
+    setStatPrecision("2");
+    setRollingWindow("17");
+    setTheme("dark");
+    setFontScale("normal");
+    setAnimation("full");
+  };
 
   const toggleStat = (key) => {
     setStatSet((prev) => {
@@ -214,6 +234,7 @@ export default function SettingsPage({ sessions, activeId, accent, onAccentChang
           type="button"
           className="settings-reset"
           title="Reset to defaults"
+          onClick={() => setConfirmDialog("reset")}
         >
           <i className="bx bx-reset"></i> Reset to defaults
         </button>
@@ -477,6 +498,20 @@ export default function SettingsPage({ sessions, activeId, accent, onAccentChang
         </Section>
       </div>
 
+      {confirmDialog === "reset" && (
+        <SessionModal
+          title="Reset all settings to defaults?"
+          body="This will restore every preference — language, timing, appearance, averages, and hotkeys — to their original values."
+          confirmLabel="Reset"
+          noInput
+          onCancel={() => setConfirmDialog(null)}
+          onSubmit={() => {
+            resetLocalSettings();
+            onResetSettings();
+            setConfirmDialog(null);
+          }}
+        />
+      )}
       {confirmDialog === "session" && (
         <SessionModal
           title={`Clear "${activeSession?.name ?? "current session"}"?`}
