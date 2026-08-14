@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Dropdown from "./Dropdown.jsx";
+import SessionModal from "./SessionModal.jsx";
 
 const ACCENTS = [
   { name: "Orange", hex: "#fb8c00" },
@@ -161,7 +162,7 @@ function KbdButton({ keys, title, onChange }) {
   );
 }
 
-export default function SettingsPage({ accent, onAccentChange, customScramble, onCustomScrambleChange, precision, onPrecisionChange, penaltyKey, onPenaltyKeyChange, dnfKey, onDnfKeyChange, onClearSession, onClearAllData }) {
+export default function SettingsPage({ sessions, activeId, accent, onAccentChange, customScramble, onCustomScrambleChange, precision, onPrecisionChange, penaltyKey, onPenaltyKeyChange, dnfKey, onDnfKeyChange, onClearSession, onClearAllData }) {
   const [language, setLanguage] = useState("en");
   const [inspection, setInspection] = useState(true);
   const [inspectionSeconds, setInspectionSeconds] = useState("15");
@@ -179,6 +180,8 @@ export default function SettingsPage({ accent, onAccentChange, customScramble, o
   const [theme, setTheme] = useState("dark");
   const [fontScale, setFontScale] = useState("normal");
   const [animation, setAnimation] = useState("full");
+  // Which destructive action is awaiting confirmation: 'session' | 'all' | null
+  const [confirmDialog, setConfirmDialog] = useState(null);
 
   const toggleStat = (key) => {
     setStatSet((prev) => {
@@ -188,6 +191,11 @@ export default function SettingsPage({ accent, onAccentChange, customScramble, o
       return next;
     });
   };
+
+  const activeSession = sessions.find((s) => s.id === activeId) ?? null;
+  const activeSolves = activeSession?.solves.length ?? 0;
+  const totalSessions = sessions.length;
+  const totalSolves = sessions.reduce((n, s) => n + s.solves.length, 0);
 
   return (
     <div className="settings-page">
@@ -432,7 +440,7 @@ export default function SettingsPage({ accent, onAccentChange, customScramble, o
             <button
               type="button"
               className="settings-btn settings-btn-danger"
-              onClick={onClearSession}
+              onClick={() => setConfirmDialog("session")}
             >
               <i className="bx bx-trash"></i> Clear
             </button>
@@ -444,21 +452,45 @@ export default function SettingsPage({ accent, onAccentChange, customScramble, o
             <button
               type="button"
               className="settings-btn settings-btn-danger"
-              onClick={() => {
-                if (
-                  window.confirm(
-                    "Delete all sessions and solves? This cannot be undone.",
-                  )
-                ) {
-                  onClearAllData();
-                }
-              }}
+              onClick={() => setConfirmDialog("all")}
             >
               <i className="bx bx-trash"></i> Erase all
             </button>
           </Row>
         </Section>
       </div>
+
+      {confirmDialog === "session" && (
+        <SessionModal
+          title={`Clear "${activeSession?.name ?? "current session"}"?`}
+          body={`This will permanently delete all ${activeSolves} ${
+            activeSolves === 1 ? "solve" : "solves"
+          } in this session.`}
+          confirmLabel="Clear"
+          danger
+          onCancel={() => setConfirmDialog(null)}
+          onSubmit={() => {
+            onClearSession();
+            setConfirmDialog(null);
+          }}
+        />
+      )}
+      {confirmDialog === "all" && (
+        <SessionModal
+          title="Clear all data?"
+          body={`This will permanently delete all ${totalSessions} ${
+            totalSessions === 1 ? "session" : "sessions"
+          } and ${totalSolves} ${totalSolves === 1 ? "solve" : "solves"}. It cannot be undone.`}
+          confirmLabel="Erase all"
+          danger
+          tone="danger-darkest"
+          onCancel={() => setConfirmDialog(null)}
+          onSubmit={() => {
+            onClearAllData();
+            setConfirmDialog(null);
+          }}
+        />
+      )}
     </div>
   );
 }

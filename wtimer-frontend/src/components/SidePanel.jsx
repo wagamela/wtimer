@@ -1,7 +1,8 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { formatTime, calcAo, bestAo } from '../utils/format.js';
 import { mean } from '../utils/stats.js';
 import SessionSelector from './SessionSelector.jsx';
+import SessionModal from './SessionModal.jsx';
 
 export default function SidePanel({
   solves,
@@ -32,6 +33,12 @@ export default function SidePanel({
   const ao12Pb = bestAo(eventValid, 12);
 
   const fmt = (v) => (v !== null ? formatTime(v) : '—');
+
+  // Custom confirmation for clearing the whole session's solves. Deleting a
+  // single solve (onRemove) stays instant — this only guards the bulk clear.
+  const [confirmClear, setConfirmClear] = useState(false);
+  const activeSessionName =
+    sessions.find((s) => s.id === activeId)?.name ?? 'current session';
 
   // Newest at the top, oldest at the bottom.
   const rows = solves
@@ -93,7 +100,7 @@ export default function SidePanel({
       <section className="side-section side-solves">
         <div className="side-section-head">
           <span className="side-section-label">Solves</span>
-          <button className="clear-btn" onClick={onClear} title="Clear session">
+          <button className="clear-btn" onClick={() => setConfirmClear(true)} title="Clear session">
             <i className="bx bx-trash"></i>
           </button>
         </div>
@@ -151,6 +158,22 @@ export default function SidePanel({
           </ul>
         )}
       </section>
+
+      {confirmClear && (
+        <SessionModal
+          title={`Clear "${activeSessionName}"?`}
+          body={`This will permanently delete all ${solves.length} ${
+            solves.length === 1 ? 'solve' : 'solves'
+          } in this session.`}
+          confirmLabel="Clear"
+          danger
+          onCancel={() => setConfirmClear(false)}
+          onSubmit={() => {
+            onClear();
+            setConfirmClear(false);
+          }}
+        />
+      )}
     </div>
   );
 }

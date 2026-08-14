@@ -493,6 +493,7 @@ export default function SessionsPage({
           } in this session.`}
           confirmLabel="Delete"
           danger
+          tone="danger-dark"
           onCancel={() => setDialog(null)}
           onSubmit={() => {
             onDeleteSession(dialog.session.id);

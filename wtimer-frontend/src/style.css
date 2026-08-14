@@ -851,13 +851,33 @@ body {
   filter: brightness(0.85);
 }
 
+/* Destructive confirm buttons — filled red with white text, same shape as the
+   primary button so every alert reads consistently. Clear is red, delete and
+   erase-all step down to darker shades to signal increasing severity. */
 .modal-btn.danger {
-  color: #e57373;
+  background: #e53935;
+  color: #fff;
 }
 
 .modal-btn.danger:hover {
-  background: rgba(229, 57, 53, 0.15);
-  color: #ff8a80;
+  background: #d32f2f;
+  color: #fff;
+}
+
+.modal-btn.danger.danger-dark {
+  background: #c62828;
+}
+
+.modal-btn.danger.danger-dark:hover {
+  background: #b71c1c;
+}
+
+.modal-btn.danger.danger-darkest {
+  background: #b71c1c;
+}
+
+.modal-btn.danger.danger-darkest:hover {
+  background: #8e1b1b;
 }
 
 /* ── Side panel sections ── */

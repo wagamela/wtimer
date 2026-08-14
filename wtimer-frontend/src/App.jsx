@@ -141,6 +141,8 @@ export default function App() {
         </div>
       ) : view === 'settings' ? (
         <SettingsPage
+          sessions={sessions}
+          activeId={activeId}
           accent={accent}
           onAccentChange={setAccent}
           customScramble={customScramble}
